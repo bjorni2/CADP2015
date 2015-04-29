@@ -10,3 +10,5 @@ $(TARGET):
 
 clean:
 	rm $(TARGET)
+
+.PHONY: $(TARGET)

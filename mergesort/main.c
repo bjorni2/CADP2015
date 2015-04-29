@@ -21,30 +21,37 @@ sem_t threads;
 
 int main(int argc, char** argv)
 {
-	sem_init(&threads, 0, 190);
 	int SZ;
-	clock_t begin, end;
 	double time_spent;
 	int* arr;
 	int i;
+	int MAX_THREADS = 20;
+	struct timespec begin, end;
 
 	if (argc < 2) {
-		fprintf(stderr, "Second argument required!");
+		fprintf(stderr, "Second argument required!\n");
 		return -1;
 	}
+	if (argc > 2) {
+		MAX_THREADS = atoi(argv[2]);
+	}
+
 
 	SZ = atoi(argv[1]);
 	arr = malloc(sizeof(int) * SZ);
+
+	sem_init(&threads, 0, MAX_THREADS);
 
 	for(i = 0; i < SZ; i++){
 		arr[i] = rand();
 	}
 
 	printf("Calling sort\n");
-	begin = clock();
+	clock_gettime(CLOCK_REALTIME, &begin);
 	sort(arr, SZ);
-	end = clock();
-	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	clock_gettime(CLOCK_REALTIME, &end);
+
+	time_spent = ((double) end.tv_sec + end.tv_nsec*1e-9) - ((double) begin.tv_sec + begin.tv_nsec*1e-9);
 	printf("Returned from sort after %f\n", time_spent);
 
 	return 0;
