@@ -1,10 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include <errno.h>
+#include <limits.h>
 #include <pthread.h>
 #include <semaphore.h>
-#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 void mergesort(int *arr, int lower, int upper);
 void* tmergesort(void* vargp);
@@ -26,6 +27,7 @@ int main(int argc, char** argv)
 	int* arr;
 	int i;
 	int MAX_THREADS = 20;
+	int MAX_NUM = INT_MAX;
 	struct timespec begin, end;
 
 	if (argc < 2) {
@@ -35,15 +37,17 @@ int main(int argc, char** argv)
 	if (argc > 2) {
 		MAX_THREADS = atoi(argv[2]);
 	}
-
+	if (argc > 3) {
+		MAX_NUM = atoi(argv[3]);
+	}
 
 	SZ = atoi(argv[1]);
 	arr = malloc(sizeof(int) * SZ);
 
 	sem_init(&threads, 0, MAX_THREADS);
 
-	for(i = 0; i < SZ; i++){
-		arr[i] = rand();
+	for(i = 0; i < SZ; i++) {
+		arr[i] = rand() % MAX_NUM;
 	}
 
 	printf("Calling sort\n");
@@ -53,6 +57,13 @@ int main(int argc, char** argv)
 
 	time_spent = ((double) end.tv_sec + end.tv_nsec*1e-9) - ((double) begin.tv_sec + begin.tv_nsec*1e-9);
 	printf("Returned from sort after %f\n", time_spent);
+
+	if (MAX_NUM != INT_MAX) {
+		for (i = 0; i < SZ; i++) {
+			printf("%d ", arr[i]);
+		}
+		printf("\n");
+	}
 
 	return 0;
 }
