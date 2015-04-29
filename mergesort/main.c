@@ -22,11 +22,19 @@ sem_t threads;
 int main(int argc, char** argv)
 {
 	sem_init(&threads, 0, 190);
-	int SZ = atoi(argv[1]);
+	int SZ;
 	clock_t begin, end;
 	double time_spent;
-	int* arr = malloc(sizeof(int) * SZ);
+	int* arr;
 	int i;
+
+	if (argc < 2) {
+		fprintf(stderr, "Second argument required!");
+		return -1;
+	}
+
+	SZ = atoi(argv[1]);
+	arr = malloc(sizeof(int) * SZ);
 
 	for(i = 0; i < SZ; i++){
 		arr[i] = rand();
@@ -132,6 +140,7 @@ void* tmergesort(void* vargp){
 			merge(arr, lower, middle, upper);
 		}
 	}
+	return NULL;
 }
 
 void merge(int *arr, int lower, int middle, int upper){
