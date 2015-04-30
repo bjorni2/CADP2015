@@ -2,6 +2,7 @@
 
 bool started_s = false;
 unsigned int K_s;
+sem_t light_s;
 
 void start_s(unsigned int k, size_t MAX_SPAWNS) {
 	pthread_t pt;
@@ -15,31 +16,23 @@ void start_s(unsigned int k, size_t MAX_SPAWNS) {
 
 	pthread_create(&pt, NULL, spawner_s, ((void *) MAX_SPAWNS));
 
-	// TODO: controller stuff
-	
+	sem_init(&light_s, 0, 1);
+
 	pthread_join(pt, NULL);
 }
 
 void try_cross(unsigned int type) {
+	sem_wait(&light_s);
 
 	if (type == PEDESTRIAN) {
-		// if car driving, wait
-
-		// if car waiting, go if counter ok
-
-		// else go
-
+		
 	} else if (type == VEHICLE) {
-		// if pedestrian, wait
-
-		// if ped waiting, go if counter ok
-
-		// else go
 
 	} else {
 		log_error("Undefined crosser");
 	}
 
+	sem_post(&light_s);
 }
 
 void * spawner_s(void * argp) {
