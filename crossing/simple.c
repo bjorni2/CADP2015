@@ -10,7 +10,6 @@ void start_s(unsigned int k, size_t MAX_SPAWNS) {
 		fprintf(stderr, "Already started! Aborting.\n");
 		return;
 	}
-	printf("hi\n");
 	started_s = true;
 	K_s = k;
 
@@ -21,7 +20,7 @@ void start_s(unsigned int k, size_t MAX_SPAWNS) {
 	pthread_join(pt, NULL);
 }
 
-void try_cross(unsigned int type) {
+void try_cross_s(unsigned int type) {
 	sem_wait(&light_s);
 
 	if (type == PEDESTRIAN) {
@@ -36,14 +35,29 @@ void try_cross(unsigned int type) {
 }
 
 void * spawner_s(void * argp) {
-	size_t MAX_SPAWNS = (size_t) argp;
+	struct timespec t;
+	struct timespec rem;
+	size_t i, MAX_SPAWNS = (size_t) argp;
 	char * msg = malloc(MSG_SIZE);
 
 	sprintf(msg, "Spawner initialized: %lu", MAX_SPAWNS);
 	log_action(msg);
 
-	// TODO: Spawn some stuff randomnly
+	t.tv_sec = 0;
+	t.tv_nsec = 1000000;
+	rem.tv_sec = 0;
+	rem.tv_nsec = 0;
 
+	// TODO: Spawn some stuff randomnly
+    for (i = 0; i < MAX_SPAWNS; i++)
+    {
+        double x = (double) rand() / (double) RAND_MAX;
+		pthread_t pt;
+        if (x < 0.5) pthread_create(&pt, NULL, enter_v, NULL);
+        else pthread_create(&pt, NULL, enter_p, NULL);
+        nanosleep(&t, &rem);
+		pthread_detach(pt);
+    }
 
 	free(msg);
 	return NULL;

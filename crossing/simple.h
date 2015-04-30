@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #define PEDESTRIAN 1
 #define VEHICLE    2
@@ -10,8 +10,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "logger.h"
+#include "pedestrian.h"
+#include "vehicle.h"
 
 extern struct simple {
 	unsigned int v_waiting;
@@ -25,7 +28,7 @@ extern bool started_s;
 extern unsigned int K_s;
 
 void start_s(unsigned int k, size_t MAX_SPAWNS);
-void try_cross(unsigned int type);
+void try_cross_s(unsigned int type);
 
 // unsigned int MAX_SPAWNS
 void * spawner_s(void * argp);

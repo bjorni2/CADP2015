@@ -1,4 +1,5 @@
 #pragma once
+#include "simple.h"
 
-void * enter(void * argp);
+void * enter_v(void * argp);
 

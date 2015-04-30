@@ -9,8 +9,6 @@
 #include "crossing.h"
 #include "logger.h"
 #include "screen.h"
-#include "pedestrian.h"
-#include "vehicle.h"
 
 void fatal_error(const char * msg);
 
@@ -18,6 +16,7 @@ int main(int argc, char * argv[]) {
 	if (argc < 2) {
 		fatal_error("missing argument");
 	}
+	printf("%s\n", argv[1]);
 
 	// TODO: switch chosen_crossing
 	// spawn correct controller
