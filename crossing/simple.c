@@ -20,6 +20,28 @@ void start_s(unsigned int k, size_t MAX_SPAWNS) {
 	pthread_join(pt, NULL);
 }
 
+void try_cross(unsigned int type) {
+
+	if (type == PEDESTRIAN) {
+		// if car driving, wait
+
+		// if car waiting, go if counter ok
+
+		// else go
+
+	} else if (type == VEHICLE) {
+		// if pedestrian, wait
+
+		// if ped waiting, go if counter ok
+
+		// else go
+
+	} else {
+		log_error("Undefined crosser");
+	}
+
+}
+
 void * spawner_s(void * argp) {
 	size_t MAX_SPAWNS = (size_t) argp;
 	char * msg = malloc(MSG_SIZE);

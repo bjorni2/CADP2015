@@ -1,7 +1,11 @@
 #include "logger.h"
 
-// logging_opts.debug = false;
+struct options logging_opts = { .debug = false };
 
 void log_action(const char * msg) {
 	fprintf(stdout, "%s\n", msg);
+}
+
+void log_error(const char * msg) {
+	fprintf(stderr, "%s\n", msg);
 }
