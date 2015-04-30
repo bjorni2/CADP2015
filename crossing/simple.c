@@ -1,10 +1,11 @@
 #include "simple.h"
 
-struct simple state_s = { .turn = 0 };
+struct simple state_s = { .turn = -1 };
 
 bool started_s = false;
 unsigned int K_s;
 sem_t light_s;
+sem_t lord_s;
 
 void start_s(unsigned int k, size_t MAX_SPAWNS) {
 	unsigned int i;
@@ -21,9 +22,11 @@ void start_s(unsigned int k, size_t MAX_SPAWNS) {
 		state_s.crossing[i] = 0;
 	}
 
-	pthread_create(&pt, NULL, spawner_s, ((void *) MAX_SPAWNS));
-
 	sem_init(&light_s, 0, 1);
+	sem_init(&turn[PEDESTRIAN], 0, 0);
+	sem_init(&turn[VEHICLE], 0, 1);
+	state_s.turn = VEHICLE;
+	pthread_create(&pt, NULL, spawner_s, ((void *) MAX_SPAWNS));
 
 	while (true) {
 		struct timespec t;
@@ -43,22 +46,35 @@ void try_cross_s(unsigned int type) {
 
 	if (type >= MAX_TYPE) {
 		log_error("Undefined crosser");
-		
-	} else {
-		if (!can_cross(type)) {
-			waiting(type);
-			sem_post(&light_s);
-			// gotta go
-			// TODO: cond dótið
-			// should now be waiting
-			sem_wait(&light_s);
-			not_waiting(type);
-			cross(type);
-			done_crossing_s(type);
-		} else {
-			sem_post(&light_s);
+		sem_post(&light_s);
+		return;
+	} else if (can_cross_s(type)) { // my turn
+		cross(type); // start crossing
+		sem_post(&light_s); // others can start crossing
+		// TODO: something
+	} else { // not my turn
+		bool lord = false;
+		waiting(turn);
+		if (state_s.waiting[type] == 1) {
+			lord = true;
 		}
+		sem_post(&light_s);
+
+		if (lord) {
+			sem_wait(&lord_s);
+			// LORD STUFF?
+			sem_post(&lord_s);
+		}
+
+		// TODO something
+		
+		// when it's my turn again:
+		sem_wait(&light_s);
+		not_waiting(type);
 		cross(type);
+		sem_post(&light_s);
+
+		return;
 	}
 }
 
@@ -90,23 +106,16 @@ void * spawner_s(void * argp) {
 	return NULL;
 }
 
-inline bool can_cross(unsigned int type) {
-	unsigned int i, max = 0;
-	if (state_s.turn == type || state_s.crossing[type]) {
-		return true;
+inline bool can_cross_s(unsigned int type) {
+	int i;
+	for (i = 0; i < MAX_TYPE; ++i) {
+		if (i == type) continue;
+		if (state_s.crossing[type]) {
+			return false;
+		}
 	}
 
-	for (i = 0; i < MAX_TYPE; ++i) { 
-		max = (state_s.waiting[i] > max) ? state_s.waiting[i] : max;
-		if (type == i) continue;
-		if (state_s.crossing[i]) return false;
-	}
-
-	if (max == state_s.waiting[type]) {
-		state_s.turn = true;
-		return true;
-	}
-	return false;
+	return (state_s.turn == type);
 }
 
 inline void cross(unsigned int type) {
@@ -121,12 +130,6 @@ void done_crossing_s(unsigned int type) {
 	sem_wait(&light_s);
 	char *msg = malloc(MSG_SIZE);
 	state_s.crossing[type] -= 1;
-	if (state_s.crossing[type] == 0) {
-		state_s.turn = type + 1;
-		if (state_s.turn >= MAX_TYPE) {
-			state_s.turn = 0;
-		}
-	}
 	sprintf(msg, "%u -CROSS", type);
 	log_action(msg);
 	free(msg);
