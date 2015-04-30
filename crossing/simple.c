@@ -48,16 +48,15 @@ void * spawner_s(void * argp) {
 	rem.tv_sec = 0;
 	rem.tv_nsec = 0;
 
-	// TODO: Spawn some stuff randomnly
-    for (i = 0; i < MAX_SPAWNS; i++)
-    {
-        double x = (double) rand() / (double) RAND_MAX;
+	for (i = 0; i < MAX_SPAWNS; i++)
+	{
+		double x = (double) rand() / (double) RAND_MAX;
 		pthread_t pt;
-        if (x < 0.5) pthread_create(&pt, NULL, enter_v, NULL);
-        else pthread_create(&pt, NULL, enter_p, NULL);
-        nanosleep(&t, &rem);
+		if (x < 0.5) pthread_create(&pt, NULL, enter_v, NULL);
+		else pthread_create(&pt, NULL, enter_p, NULL);
+		nanosleep(&t, &rem);
 		pthread_detach(pt);
-    }
+	}
 
 	free(msg);
 	return NULL;
