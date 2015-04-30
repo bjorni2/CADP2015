@@ -2,6 +2,6 @@
 
 void * enter_v(void * argp)
 {
-    try_cross_s(2);
+    try_cross_s(VEHICLE);
     return argp;
 }

@@ -1,13 +1,15 @@
 #pragma once
 
-#define PEDESTRIAN 1
-#define VEHICLE    2
+#define PEDESTRIAN 0
+#define VEHICLE    1
+#define MAX_TYPE   2
 
 #define MSG_SIZE   256
 
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdbool.h>
+#include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -17,11 +19,9 @@
 #include "vehicle.h"
 
 extern struct simple {
-	unsigned int v_waiting;
-	unsigned int p_waiting;
-	unsigned int v_crossing;
-	unsigned int p_crossing;
-
+	unsigned int waiting [2];
+	unsigned int crossing [2];
+	unsigned int turn;
 } state_s;
 
 extern bool started_s;
@@ -30,6 +30,11 @@ extern unsigned int K_s;
 void start_s(unsigned int k, size_t MAX_SPAWNS);
 void try_cross_s(unsigned int type);
 
-// unsigned int MAX_SPAWNS
 void * spawner_s(void * argp);
 
+void done_crossing_s(unsigned int type);
+// inline functions
+inline bool can_cross(unsigned int type);
+inline void cross(unsigned int type);
+inline void waiting(unsigned int type);
+inline void not_waiting(unsigned int type);
