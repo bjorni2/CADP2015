@@ -1,4 +1,4 @@
 #pragma once
 
-void * enter(void * argp);
+void * enter_v(void * argp);
 

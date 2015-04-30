@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #define PEDESTRIAN 1
 #define VEHICLE    2
@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "logger.h"
 
