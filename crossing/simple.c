@@ -20,6 +20,7 @@ void start_s(unsigned int k, size_t MAX_SPAWNS) {
 	for (i = 0; i < MAX_TYPE; ++i) {
 		state_s.waiting[i] = 0;
 		state_s.crossing[i] = 0;
+		state_s.k[i] = 1;
 	}
 
 	sem_init(&light_s, 0, 1);
@@ -59,7 +60,8 @@ void try_cross_s(unsigned int type) {
 		sem_post(&light_s);
 		sem_wait(&turn[type]);
 	}
-	sate_s.k[!type]--;
+	if(state_s.waiting[!TYPE] > 0)
+		sate_s.k[!type]--;
 	inc_cross_s(type);
 	signal_s();
 	rand_sleep(10);
