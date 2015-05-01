@@ -129,6 +129,10 @@ void opt_into_line(char * line, unsigned int num) {
 	opt_generic_line(line, num, 40);
 }
 
+void opt_inside_line(char * line, unsigned int num) {
+	opt_generic_line(line, num, 39);
+}
+
 void opt_side_line(char * line, unsigned int num) {
 	opt_generic_line(line, num, 49);
 }
