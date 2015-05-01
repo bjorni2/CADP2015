@@ -2,5 +2,6 @@
 #include "simple.h"
 
 void * enter_v(void * argp);
-inline void veh_do_crossing();
+void * enter_v_c(void * argp);
+void * enter_v_b(void * argp);
 
