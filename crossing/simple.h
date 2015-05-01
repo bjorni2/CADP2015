@@ -36,7 +36,7 @@ void try_cross_s(unsigned int type);
 
 void * spawner_s(void * argp);
 
-void signal_s();
+void signal_s(unsigned int type);
 
 void log_sem(unsigned int type);
 // inline functions
