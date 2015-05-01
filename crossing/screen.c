@@ -137,6 +137,10 @@ void opt_side_line(char * line, unsigned int num) {
 	opt_generic_line(line, num, 49);
 }
 
+void opt_side2line(char * line, unsigned int num) {
+	opt_generic_line(line, num, 24);
+}
+
 void opt_generic_line(char * line, unsigned int num, unsigned int pos) {
 	while (true) {
 		unsigned int digit = num % 10;
@@ -177,12 +181,12 @@ void insert_critical_c1(char * buf, struct crossing * c) {
 	make_line(line);
 	make_roadline_h2(line);
 	memset(line + 19, 'V', 1);
-	opts_side2_line(line, c->crossing_e[VEHICLE]);
+	opt_side2line(line, c->crossing_e[VEHICLE]);
 	ins_to_buf(buf, line);
 	make_roadline_d(line);
 	make_roadline_h2(line);
 	memset(line + 19, 'P', 1);
-	opts_side2_line(line, c->crossing_e[PEDESTRIAN]);
+	opt_side2line(line, c->crossing_e[PEDESTRIAN]);
 	ins_to_buf(buf, line);
 	make_line(line);
 	make_roadline_h2(line);
@@ -195,7 +199,7 @@ void insert_critical_c1(char * buf, struct crossing * c) {
 	make_roadline(line);
 	memset(line + 18, 'p', 1);
 	memset(line + 19, ':', 1);
-	opts_side2_line(line, c->waiting_e[PEDESTRIAN]);
+	opt_side2line(line, c->waiting_e[PEDESTRIAN]);
 	ins_to_buf(buf, line);
 	free(line);
 }
@@ -232,14 +236,14 @@ void insert_critical_b1(char * buf, struct busy * b) {
 	make_line(line);
 	make_roadline_h2(line);
 	// V xxxx
-	// opts_side2_line(line, ??);
+	// opt_side2line(line, ??);
 	memset(line + 37, '/', 1);
 	memset(line + 42, '/', 1);
 	ins_to_buf(buf, line);
 	make_roadline_d(line);
 	make_roadline_h2(line);
 	// P xxxx
-	// opts_side2_line(line, ??);
+	// opt_side2line(line, ??);
 	memset(line + 35, '/', 1);
 	memset(line + 40, '/', 1);
 	ins_to_buf(buf, line);
@@ -258,7 +262,7 @@ void insert_critical_b1(char * buf, struct busy * b) {
 	make_roadline(line);
 	memset(line + 18, 'p', 1);
 	memset(line + 19, ':', 1);
-	// opts_side2_line(line, ??);
+	// opt_side2line(line, ??);
 	memset(line + 34, '/', 1);
 	ins_to_buf(buf, line);
 	free(line);

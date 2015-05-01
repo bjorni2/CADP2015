@@ -33,6 +33,7 @@ void insert_segment(char * buf, unsigned int seg);
 void insert_segments(char * buf, unsigned int seg);
 void opt_into_line(char * line, unsigned int num);
 void opt_side_line(char * line, unsigned int num);
+void opts_side2_line(char * line, unsigned int num);
 void opt_generic_line(char * line, unsigned int num, unsigned int pos);
 
 void insert_critical_s(char *buf, struct simple * s);
