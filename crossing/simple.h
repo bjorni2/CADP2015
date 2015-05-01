@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "logger.h"
+#include "tools.h"
 #include "pedestrian.h"
 #include "vehicle.h"
 
@@ -28,7 +29,6 @@ extern struct simple {
 extern bool started_s;
 extern unsigned int K_s;
 extern sem_t light_s;
-extern sem_t lord_s;
 extern sem_t turn[MAX_TYPE];
 
 void start_s(unsigned int k, size_t MAX_SPAWNS);
@@ -36,10 +36,12 @@ void try_cross_s(unsigned int type);
 
 void * spawner_s(void * argp);
 
-void done_crossing_s(unsigned int type);
+void signal_s();
+
 void log_sem(unsigned int type);
 // inline functions
 inline bool can_cross_s(unsigned int type);
-inline void cross(unsigned int type);
+inline void inc_cross_s(unsigned int type);
+inline void done_crossing_s(unsigned int type);
 inline void waiting(unsigned int type);
 inline void not_waiting(unsigned int type);

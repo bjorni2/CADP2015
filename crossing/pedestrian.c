@@ -4,7 +4,7 @@ void * enter_p(void * argp)
 {
     try_cross_s(PEDESTRIAN);
 	// either I cross, or I can't and I'm suspended
-	ped_do_crossing();
+//	ped_do_crossing();
     return argp;
 }
 

@@ -21,7 +21,7 @@ int main(int argc, char * argv[]) {
 	// TODO: switch chosen_crossing
 	// spawn correct controller
 
-	start_s(9, 9);
+	start_s(3, 900);
 
 	return 0;
 }
