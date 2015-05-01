@@ -22,7 +22,7 @@ extern struct simple {
 	unsigned int waiting [2];
 	unsigned int crossing [2];
 	unsigned int turn;
-	unsigned int k;
+	unsigned int k [2];
 	bool timeout;
 } state_s;
 
