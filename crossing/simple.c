@@ -26,6 +26,7 @@ void start_s(unsigned int k, size_t MAX_SPAWNS) {
 	sem_init(&light_s, 0, 1);
 	sem_init(&turn[PEDESTRIAN], 0, 0);
 	sem_init(&turn[VEHICLE], 0, 1);
+	sem_init(&lord_s, 0, 1);
 	state_s.turn = VEHICLE;
 	pthread_create(&pt, NULL, spawner_s, ((void *) MAX_SPAWNS));
 
