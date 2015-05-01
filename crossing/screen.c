@@ -176,24 +176,26 @@ void insert_critical_c1(char * buf, struct crossing * c) {
 	ins_to_buf(buf, line);
 	make_line(line);
 	make_roadline_h2(line);
-	// V xxxx
-	// opts_side2_line(line, ??);
+	memset(line + 19, 'V', 1);
+	opts_side2_line(line, c->crossing_e[VEHICLE]);
 	ins_to_buf(buf, line);
 	make_roadline_d(line);
 	make_roadline_h2(line);
-	// P xxxx
-	// opts_side2_line(line, ??);
+	memset(line + 19, 'P', 1);
+	opts_side2_line(line, c->crossing_e[PEDESTRIAN]);
 	ins_to_buf(buf, line);
 	make_line(line);
 	make_roadline_h2(line);
 	ins_to_buf(buf, line);
 	make_roadline_h(line);
 	make_roadline_h2(line);
+	memset(line + 31, ' ', 1);
+	memset(line + 41, ' ', 1);
 	ins_to_buf(buf, line);
 	make_roadline(line);
 	memset(line + 18, 'p', 1);
 	memset(line + 19, ':', 1);
-	// opts_side2_line(line, ??);
+	opts_side2_line(line, c->waiting_e[PEDESTRIAN]);
 	ins_to_buf(buf, line);
 	free(line);
 }
@@ -205,19 +207,19 @@ void insert_critical_c2(char * buf, struct crossing * c) {
 	memset(line + 32, 'V', 1);
 	memset(line + 43, 'p', 1);
 	memset(line + 44, ':', 1);
-//	opt_into_line(line, s->crossing[1]);
-//	opt_side_line(line, s->waiting[0]);
+	opt_into_line(line, c->crossing_n[VEHICLE]);
+	opt_side_line(line, c->waiting_e[PEDESTRIAN]);
 	ins_to_buf(buf, line);
 	make_roadline(line);
 	memset(line + 32, 'P', 1);
 	memset(line + 36, '|', 1);
-//	opt_into_line(line, s->crossing[0]);
+	opt_into_line(line, c->crossing_e[PEDESTRIAN]);
 	ins_to_buf(buf, line);
 	insert_segment(buf, SEG_WALK);
 	make_roadline(line);
 	memset(line + 32, 'v', 1);
 	memset(line + 33, ':', 1);
-//	opt_into_line(line, s->waiting[1]);
+	opt_into_line(line, c->waiting_n[VEHICLE]);
 	ins_to_buf(buf, line);
 	free(line);
 }
@@ -251,6 +253,7 @@ void insert_critical_b1(char * buf, struct busy * b) {
 	make_roadline_h2(line);
 	memset(line + 31, '/', 1);
 	memset(line + 36, '/', 1);
+	memset(line + 41, ' ', 1);
 	ins_to_buf(buf, line);
 	make_roadline(line);
 	memset(line + 18, 'p', 1);
@@ -284,7 +287,6 @@ void insert_critical_b2(char * buf, struct busy * b) {
 	ins_to_buf(buf, line);
 	free(line);
 }
-
 
 void * draw_s(void * argp) {
 	struct simple * s = argp;

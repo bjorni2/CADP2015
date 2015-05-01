@@ -50,3 +50,19 @@ void try_cross_ped(unsigned int dir){
 	
 }
 void try_cross_veh(unsigned int dir);
+
+inline void inc_cross_c(unsigned int type, unsigned int dir) {
+
+}
+
+inline void done_crossing_c(unsigned int type, unsigned int dir) { 
+
+}
+
+inline void waiting_c(unsigned int type, unsigned int dir) {
+
+}
+
+inline void not_waiting_c(unsigned int type, unsigned int dir) {
+
+}
