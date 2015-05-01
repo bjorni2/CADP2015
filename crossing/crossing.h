@@ -13,7 +13,10 @@
 #include "vehicle.h"
 
 struct crossing {
-	int a;
+	unsigned int crossing_n[2];
+	unsigned int crossing_e[2];
+	unsigned int waiting_n[2];
+	unsigned int waiting_e[2];
 } state_c;
 
 void start_c(unsigned int k, size_t MAX_SPAWNS);
