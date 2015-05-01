@@ -44,5 +44,5 @@ void signal_c(unsigned int type);
 
 inline void inc_cross_c(unsigned int type, unsigned int dir);
 inline void done_crossing_c(unsigned int type, unsigned int dir);
-inline void waiting(unsigned int type, unsigned int dir);
-inline void not_waiting(unsigned int type, unsigned int dir);
+inline void waiting_c(unsigned int type, unsigned int dir);
+inline void not_waiting_c(unsigned int type, unsigned int dir);
