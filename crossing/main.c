@@ -17,7 +17,7 @@ int main(int argc, char * argv[]) {
 		fatal_error("missing argument");
 	}
 	printf("%s\n", argv[1]);
-
+	
 	// TODO: switch chosen_crossing
 	// spawn correct controller
 
