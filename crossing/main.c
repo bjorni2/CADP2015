@@ -18,15 +18,17 @@ int main(int argc, char * argv[]) {
 	}
 	pthread_t pt_ui;
 	FILE *fp = fopen("log.txt", "w");
-	init_log(stdout);
+	init_log(fp);
 	
 	// TODO: switch chosen_crossing
 	// spawn correct controller
 
-//	pthread_create(&pt_ui, NULL, draw_s, (void *) &state_s);
+	pthread_create(&pt_ui, NULL, draw_s, (void *) &state_s);
 	start_s(3, 100);
-//	pthread_join(pt_ui, NULL);
+	draw_stop();
+	pthread_join(pt_ui, NULL);
 
+	printf("%s\n", argv[1]);
 	return 0;
 }
 

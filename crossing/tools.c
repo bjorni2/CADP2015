@@ -4,6 +4,9 @@ const unsigned int NS_IN_S = 1000 * 1000 * 1000;
 
 void rand_sleep(unsigned int max) {
 	unsigned int ms = rand() % max;
+	if (ms < 10 && 10 < max) {
+		ms = 10;
+	}
 	milli_sleep(ms);
 }
 

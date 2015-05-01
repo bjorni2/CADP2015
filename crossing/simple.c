@@ -33,12 +33,12 @@ void start_s(unsigned int k, size_t MAX_SPAWNS) {
 		bool stop = true;
 		milli_sleep(2);	
 //		log_sem(-1);
-		/*for (i = 0; i < MAX_TYPE; ++i) {
+		for (i = 0; i < MAX_TYPE; ++i) {
 			if (atomic_load(&(state_s.waiting[i]))) stop = false;
 			if (atomic_load(&(state_s.crossing[i]))) stop = false;
-		}*/
+		}
 		if (stop) {
-			//break;
+			break;
 		}
 	}
 
@@ -68,7 +68,7 @@ void try_cross_s(unsigned int type) {
 	}
 	else
 		signal_s(); 
-	rand_sleep(10);
+	rand_sleep(50);
 	sem_wait(&light_s);
 	done_crossing_s(type);
 	if(state_s.crossing[type] == 0 && state_s.waiting[!type] > 0 && state_s.k[!type] == 0){
