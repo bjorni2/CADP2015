@@ -33,12 +33,12 @@ void start_s(unsigned int k, size_t MAX_SPAWNS) {
 		bool stop = true;
 		milli_sleep(2);	
 //		log_sem(-1);
-		for (i = 0; i < MAX_TYPE; ++i) {
+		/*for (i = 0; i < MAX_TYPE; ++i) {
 			if (atomic_load(&(state_s.waiting[i]))) stop = false;
 			if (atomic_load(&(state_s.crossing[i]))) stop = false;
-		}
+		}*/
 		if (stop) {
-			break;
+			//break;
 		}
 	}
 
@@ -60,22 +60,35 @@ void try_cross_s(unsigned int type) {
 		sem_post(&light_s);
 		sem_wait(&turn[type]);
 	}
-	if(state_s.waiting[!TYPE] > 0)
-		sate_s.k[!type]--;
+	if(state_s.waiting[!type] > 0)
+		state_s.k[!type]--;
 	inc_cross_s(type);
-	signal_s();
-	rand_sleep(1000);
+	if(state_s.waiting[!type] > 0 && state_s.k[!type] == 0){ // Ef k er 0 megum við bara opna light_s
+		sem_post(&light_s);
+	}
+	else
+		signal_s(); 
+	rand_sleep(10);
 	sem_wait(&light_s);
 	done_crossing_s(type);
-	signal_s();
+	if(state_s.crossing[type] == 0 && state_s.waiting[!type] > 0 && state_s.k[!type] == 0){
+		state_s.k[!type] = K_s;
+		not_waiting(!type);
+		sem_post(&turn[!type]);
+	}
+	else if(state_s.waiting[!type] > 0 && state_s.k[!type] == 0){ // Ef k er 0 megum við bara opna light_s
+		sem_post(&light_s);
+	}
+	else
+		signal_s(); 
 }
 
 // PRECONDITION: we have one semaphore
 void signal_s() {
-	if (state_s.crossing[PEDESTRIAN] == 0 && state_s.waiting[VEHICLE] > 0) {
+	if (state_s.crossing[PEDESTRIAN] == 0 && state_s.waiting[VEHICLE] > 0 /*&& state_s.k[PEDESTRIAN] != 0*/) {
 		not_waiting(VEHICLE);
 		sem_post(&turn[VEHICLE]);
-	} else if (state_s.crossing[VEHICLE] == 0 && state_s.waiting[PEDESTRIAN] > 0) {
+	} else if (state_s.crossing[VEHICLE] == 0 && state_s.waiting[PEDESTRIAN] > 0 /*&& state_s.k[VEHICLE] != 0*/) {
 		not_waiting(PEDESTRIAN);
 		sem_post(&turn[PEDESTRIAN]);
 	} else {
