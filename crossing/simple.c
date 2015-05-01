@@ -63,15 +63,16 @@ void try_cross_s(unsigned int type) {
 	if(state_s.waiting[!type] > 0)
 		state_s.k[!type]--;
 	inc_cross_s(type);
-	if(state_s.waiting[!type] > 0 && state_s.k[!type] == 0){ // Ef k er 0 megum við bara opna light_s
-		sem_post(&light_s);
-	}
-	else
-		signal_s(); 
-	rand_sleep(50);
+	signal_s(type); 
+	rand_sleep(100);
 	sem_wait(&light_s);
 	done_crossing_s(type);
-	if(state_s.crossing[type] == 0 && state_s.waiting[!type] > 0 && state_s.k[!type] == 0){
+	signal_s(type); 
+}
+
+// PRECONDITION: we have one semaphore
+void signal_s(unsigned int type) {
+	if(state_s.crossing[type] == 0 && state_s.waiting[!type] > 0 /*&& state_s.k[!type] == 0*/){
 		state_s.k[!type] = K_s;
 		not_waiting(!type);
 		sem_post(&turn[!type]);
@@ -79,19 +80,17 @@ void try_cross_s(unsigned int type) {
 	else if(state_s.waiting[!type] > 0 && state_s.k[!type] == 0){ // Ef k er 0 megum við bara opna light_s
 		sem_post(&light_s);
 	}
-	else
-		signal_s(); 
-}
-
-// PRECONDITION: we have one semaphore
-void signal_s() {
-	if (state_s.crossing[PEDESTRIAN] == 0 && state_s.waiting[VEHICLE] > 0 /*&& state_s.k[PEDESTRIAN] != 0*/) {
+	else if(state_s.crossing[!type] == 0 && state_s.waiting[type] > 0 /*&& state_s.k[!type] == 0*/){
+		not_waiting(type);
+		sem_post(&turn[type]);
+	}
+	/*else if (state_s.crossing[PEDESTRIAN] == 0 && state_s.waiting[VEHICLE] > 0) {
 		not_waiting(VEHICLE);
 		sem_post(&turn[VEHICLE]);
-	} else if (state_s.crossing[VEHICLE] == 0 && state_s.waiting[PEDESTRIAN] > 0 /*&& state_s.k[VEHICLE] != 0*/) {
+	} else if (state_s.crossing[VEHICLE] == 0 && state_s.waiting[PEDESTRIAN] > 0) {
 		not_waiting(PEDESTRIAN);
 		sem_post(&turn[PEDESTRIAN]);
-	} else {
+	}*/ else {
 		sem_post(&light_s);
 	}
 }
