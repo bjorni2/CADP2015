@@ -51,11 +51,15 @@ void try_cross_s(unsigned int type) {
 	}
 
 	sem_wait(&light_s);
-	if (state_s.crossing[!type] != 0) {
+	if (state_s.crossing[!type] != 0 || state_s.k[!type] == 0) {
 		waiting(type);
+		if(state_s.waiting[type] == 1){
+			state_s.k[type] = K_s;
+		}
 		sem_post(&light_s);
 		sem_wait(&turn[type]);
 	}
+	sate_s.k[!type]--;
 	inc_cross_s(type);
 	signal_s();
 	rand_sleep(10);
