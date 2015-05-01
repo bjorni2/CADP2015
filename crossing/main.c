@@ -29,7 +29,6 @@ int main(int argc, char * argv[]) {
 	for (i = 0; i < argc; ++i) {
 		char arg[16];	
 		strncpy(arg, argv[i], 16);
-
 		if (is_number(arg)) {
 			if (n1 == 0) {
 				n1 = atoi(arg);
@@ -40,7 +39,6 @@ int main(int argc, char * argv[]) {
 			strncpy(mode, arg, 16);
 		}
 	}
-
 	if (n1 > 0) {
 		if (n2 > 0) {
 			if (n1 > n2) {
@@ -57,13 +55,13 @@ int main(int argc, char * argv[]) {
 
 	if (strncmp(mode, "simple", strlen("simple")) == 0) {
 		pthread_create(&pt_ui, NULL, draw_s, (void *) &state_s);
-		start_s(3, 100);
+		start_s(k, agents);
 	} else if (strncmp(mode, "extended", strlen("extended")) == 0) {
 		pthread_create(&pt_ui, NULL, draw_c, (void *) &state_c);
-		start_c(3, 100);
+		start_c(k, agents);
 	} else if (strncmp(mode, "busy", strlen("busy")) == 0) {
 		pthread_create(&pt_ui, NULL, draw_b, (void *) &state_b);
-		start_b(3, 100);
+		start_b(k, agents);
 	} else {
 		fatal_error("Invalid argument. Valid: \"simple\", \"extended\", \"busy\".");
 	}
