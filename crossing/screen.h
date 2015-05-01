@@ -5,6 +5,9 @@
 #include "busy.h"
 #include <ncurses.h>
 #include <unistd.h>
+#include <stdbool.h>
+
+#define DELAY 30000
 
 void draw_s(struct simple s);
 void draw_c(struct crossing c);
