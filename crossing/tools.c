@@ -1,6 +1,6 @@
 #include "tools.h"
 
-const unsigned int NS_IN_S = 1000 * 1000;
+const unsigned int NS_IN_S = 1000 * 1000 * 1000;
 
 void rand_sleep(unsigned int max) {
 	unsigned int ms = rand() % max;
