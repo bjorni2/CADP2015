@@ -40,7 +40,7 @@ void try_cross_veh(unsigned int dir);
 
 void start_c(unsigned int k, size_t MAX_SPAWNS);
 
-void signal_c(unsigned int type);
+void signal_c();
 
 inline void inc_cross_c(unsigned int type, unsigned int dir);
 inline void done_crossing_c(unsigned int type, unsigned int dir);
