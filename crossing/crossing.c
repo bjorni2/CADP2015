@@ -8,7 +8,7 @@ sem_t light_c;
 sem_t turn_v[MAX_TYPE];
 sem_t turn_h[MAX_TYPE];
 
-void start_b(unsigned int k, size_t MAX_SPAWNS) {
+void start_c(unsigned int k, size_t MAX_SPAWNS) {
 	unsigned int i;
 	pthread_t pt;
 	if (started_c) {
@@ -67,7 +67,7 @@ void * spawner_c(void * argp) {
 		} else { 
 			pthread_create(&pt, NULL, enter_p_c, NULL);
 		}
-		milli_sleep(1000);
+		milli_sleep(10);
 		pthread_detach(pt);
 	}
 
@@ -91,7 +91,7 @@ void try_cross_ped(unsigned int dir){
 	inc_cross_c(PEDESTRIAN, dir);
 	signal_c();
 	//crossing, sleep?
-	rand_sleep(50);
+	rand_sleep(900);
 	sem_wait(&light_c);
 	done_inc_cross_c(PEDESTRIAN, dir);
 	signal_c();
@@ -113,7 +113,7 @@ void try_cross_veh(unsigned int dir){
 	inc_cross_c(VEHICLE, dir);
 	signal_c();
 	//crossing, sleep?
-	rand_sleep(50);
+	rand_sleep(500);
 	sem_wait(&light_c);
 	done_inc_cross_c(VEHICLE, dir);
 	signal_c();

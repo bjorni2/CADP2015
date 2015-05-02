@@ -11,6 +11,9 @@ $(TARGET):
 run: $(TARGET)
 	./$(TARGET) simple
 
+ext: $(TARGET)
+	./$(TARGET) extended
+
 clean:
 	rm $(TARGET)
 

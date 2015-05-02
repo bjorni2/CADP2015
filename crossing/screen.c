@@ -107,9 +107,9 @@ void make_roadline_d(char * line) {
 	memset(line, 0, WIDTH+1);
 	memset(line, ' ', WIDTH);
 
-	for (pos = 2; pos > WIDTH-3; ++pos) {
-		if ((pos - 2) % 4) continue;
-		if (pos < 29 && pos < 42)  continue;
+	for (pos = 2; pos < WIDTH-3; ++pos) {
+		if ((pos - 2) % 4 != 0) continue;
+		if (pos < 29 && pos > 42)  continue;
 
 		memset(line + pos, '_', 2);
 	}
@@ -190,6 +190,9 @@ void insert_critical_c1(char * buf, struct crossing * c) {
 	ins_to_buf(buf, line);
 	make_line(line);
 	make_roadline_h2(line);
+	memset(line + 12, 'v', 1);
+	memset(line + 13, ':', 1);
+	opt_generic_line(line, c->waiting_e[VEHICLE], 17);
 	ins_to_buf(buf, line);
 	make_roadline_h(line);
 	make_roadline_h2(line);
@@ -348,7 +351,7 @@ void draw_crossing(char * screen, struct crossing * s) {
 	insert_segment(screen, SEG_ROADS);
 	insert_segment(screen, SEG_ROAD);
 	insert_segment(screen, SEG_WALK);
-	insert_segment(screen, SEG_ROAD);
+	insert_segment(screen, SEG_ROADS);
 	insert_segment(screen, SEG_ROAD);
 	insert_segment(screen, SEG_WALK);
 
