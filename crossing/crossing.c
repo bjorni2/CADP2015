@@ -19,13 +19,15 @@ void start_c(unsigned int k, size_t MAX_SPAWNS) {
 	K_c = k;
 
 	for (i = 0; i < MAX_TYPE; ++i) {
-		state_c.crossing_n[i] = 0;
-		state_c.crossing_e[i] = 0;
-		state_c.waiting_n[i] = 0;
-		state_c.waiting_e[i] = 0;
+		state_c.crossing_v[i] = 0;
+		state_c.crossing_h[i] = 0;
+		state_c.waiting_v[i] = 0;
+		state_c.waiting_h[i] = 0;
 		state_c.k[i] = 0;
+		state_c.last[i] = true;
 	}
-
+	state_c.last_pv = true;
+	
 	sem_init(&light_c, 0, 1);
 	sem_init(&turn_v[PEDESTRIAN], 0, 0);
 	sem_init(&turn_v[VEHICLE], 0, 0);
@@ -39,10 +41,10 @@ void start_c(unsigned int k, size_t MAX_SPAWNS) {
 		milli_sleep(2);	
 //		log_sem(-1);
 		for (i = 0; i < MAX_TYPE; ++i) {
-			if (atomic_load(&(state_c.waiting_n[i]))) stop = false;
-			if (atomic_load(&(state_c.crossing_n[i]))) stop = false;
-			if (atomic_load(&(state_c.waiting_e[i]))) stop = false;
-			if (atomic_load(&(state_c.crossing_e[i]))) stop = false;
+			if (atomic_load(&(state_c.waiting_v[i]))) stop = false;
+			if (atomic_load(&(state_c.crossing_v[i]))) stop = false;
+			if (atomic_load(&(state_c.waiting_h[i]))) stop = false;
+			if (atomic_load(&(state_c.crossing_h[i]))) stop = false;
 		}
 		if (stop) {
 			break;
@@ -77,12 +79,12 @@ void * spawner_c(void * argp) {
 
 void try_cross_ped(unsigned int dir){
 	sem_wait(&light_c);
-	if(dir == VERTICAL && state_c.crossing_e[VEHICLE] != 0){
+	if(dir == VERTICAL && state_c.crossing_h[VEHICLE] != 0){
 		waiting_c(PEDESTRIAN, dir);
 		sem_post(&light_c);
 		sem_wait(&turn_v[PEDESTRIAN]);
 	}
-	else if(dir == HORIZONTAL && state_c.crossing_n[VEHICLE] != 0){
+	else if(dir == HORIZONTAL && state_c.crossing_v[VEHICLE] != 0){
 		waiting_c(PEDESTRIAN, dir);
 		sem_post(&light_c);
 		sem_wait(&turn_h[PEDESTRIAN]);
@@ -99,12 +101,12 @@ void try_cross_ped(unsigned int dir){
 
 void try_cross_veh(unsigned int dir){
 	sem_wait(&light_c);
-	if(dir == VERTICAL && (state_c.crossing_e[VEHICLE] != 0 || state_c.crossing_e[PEDESTRIAN] != 0)){
+	if(dir == VERTICAL && (state_c.crossing_h[VEHICLE] != 0 || state_c.crossing_h[PEDESTRIAN] != 0)){
 		waiting_c(VEHICLE, dir);
 		sem_post(&light_c);
 		sem_wait(&turn_v[VEHICLE]);
 	}
-	else if(dir == HORIZONTAL && (state_c.crossing_n[VEHICLE] != 0 || state_c.crossing_n[PEDESTRIAN] != 0)){
+	else if(dir == HORIZONTAL && (state_c.crossing_v[VEHICLE] != 0 || state_c.crossing_v[PEDESTRIAN] != 0)){
 		waiting_c(VEHICLE, dir);
 		sem_post(&light_c);
 		sem_wait(&turn_h[VEHICLE]);
@@ -120,35 +122,99 @@ void try_cross_veh(unsigned int dir){
 }
 
 void signal_c(){
-	if(state_c.waiting_n[VEHICLE] > 0 && state_c.crossing_e[VEHICLE] == 0 && state_c.crossing_e[PEDESTRIAN] == 0){
-		not_waiting_c(VEHICLE, VERTICAL);
-		sem_post(&turn_v[VEHICLE]);
+	if(state_c.waiting_v[VEHICLE] > 0 && state_c.crossing_h[VEHICLE] == 0 && state_c.crossing_h[PEDESTRIAN] == 0){
+		if(state_c.waiting_v[PEDESTRIAN] > 0){
+			if(state_c.last[VERTICAL] == true){
+				state_c.last[VERTICAL] = false;
+				not_waiting_c(VEHICLE, VERTICAL);
+				sem_post(&turn_v[VEHICLE]);
+			}
+			else{
+				state_c.last[VERTICAL] = true;
+				not_waiting_c(PEDESTRIAN, VERTICAL);
+				sem_post(&turn_v[PEDESTRIAN]);
+			}
+		}
+		else{
+			not_waiting_c(VEHICLE, VERTICAL);
+			sem_post(&turn_v[VEHICLE]);
+		}
 	}
-	else if(state_c.waiting_n[PEDESTRIAN] > 0 && state_c.crossing_e[VEHICLE] == 0){
+	else if(state_c.waiting_h[VEHICLE] > 0 && state_c.crossing_v[VEHICLE] == 0 && state_c.crossing_v[PEDESTRIAN] == 0){
+		if(state_c.waiting_h[PEDESTRIAN] > 0){
+			if(state_c.last[HORIZONTAL] == true){
+				state_c.last[HORIZONTAL] = false;
+				not_waiting_c(VEHICLE, HORIZONTAL);
+				sem_post(&turn_h[VEHICLE]);
+			}
+			else{
+				state_c.last[HORIZONTAL] = true;
+				not_waiting_c(PEDESTRIAN, HORIZONTAL);
+				sem_post(&turn_h[PEDESTRIAN]);
+			}
+		}
+		else{
+			not_waiting_c(VEHICLE, HORIZONTAL);
+			sem_post(&turn_h[VEHICLE]);
+		}
+	}
+	else if(state_c.waiting_h[PEDESTRIAN] > 0 && state_c.crossing_v[VEHICLE] == 0){
+		if(state_c.waiting_v[PEDESTRIAN] > 0){
+			if(state_c.last_pv == true){
+				state_c.last_pv = false;
+				not_waiting_c(PEDESTRIAN, HORIZONTAL);
+				sem_post(&turn_h[PEDESTRIAN]);
+			}
+			else{
+				state_c.last_pv = true;
+				not_waiting_c(PEDESTRIAN, VERTICAL);
+				sem_post(&turn_v[PEDESTRIAN]);
+			}
+		}
+		else{
+			not_waiting_c(PEDESTRIAN, HORIZONTAL);
+			sem_post(&turn_h[PEDESTRIAN]);
+		}
+	}
+	else if(state_c.waiting_v[PEDESTRIAN] > 0 && state_c.crossing_h[VEHICLE] == 0){
 		not_waiting_c(PEDESTRIAN, VERTICAL);
 		sem_post(&turn_v[PEDESTRIAN]);
-	}
-	else if(state_c.waiting_e[VEHICLE] > 0 && state_c.crossing_n[VEHICLE] == 0 && state_c.crossing_n[PEDESTRIAN] == 0){
-		not_waiting_c(VEHICLE, HORIZONTAL);
-		sem_post(&turn_h[VEHICLE]);
-	}
-	else if(state_c.waiting_e[PEDESTRIAN] > 0 && state_c.crossing_n[VEHICLE] == 0){
-		not_waiting_c(PEDESTRIAN, HORIZONTAL);
-		sem_post(&turn_h[PEDESTRIAN]);
 	}
 	else{
 		sem_post(&light_c);
 	}
 }
 
+/*void signal_c(){
+	if(state_c.waiting_v[VEHICLE] > 0 && state_c.crossing_h[VEHICLE] == 0 && state_c.crossing_h[PEDESTRIAN] == 0){
+		not_waiting_c(VEHICLE, VERTICAL);
+		sem_post(&turn_v[VEHICLE]);
+	}
+	else if(state_c.waiting_v[PEDESTRIAN] > 0 && state_c.crossing_h[VEHICLE] == 0){
+		not_waiting_c(PEDESTRIAN, VERTICAL);
+		sem_post(&turn_v[PEDESTRIAN]);
+	}
+	else if(state_c.waiting_h[VEHICLE] > 0 && state_c.crossing_v[VEHICLE] == 0 && state_c.crossing_v[PEDESTRIAN] == 0){
+		not_waiting_c(VEHICLE, HORIZONTAL);
+		sem_post(&turn_h[VEHICLE]);
+	}
+	else if(state_c.waiting_h[PEDESTRIAN] > 0 && state_c.crossing_v[VEHICLE] == 0){
+		not_waiting_c(PEDESTRIAN, HORIZONTAL);
+		sem_post(&turn_h[PEDESTRIAN]);
+	}
+	else{
+		sem_post(&light_c);
+	}
+}*/
+
 // TODO: log
 inline void inc_cross_c(unsigned int type, unsigned int dir) {
 	switch (dir) {
 		case HORIZONTAL:
-			state_c.crossing_e[type] += 1;
+			state_c.crossing_h[type] += 1;
 			break;
 		case VERTICAL:
-			state_c.crossing_n[type] += 1;
+			state_c.crossing_v[type] += 1;
 			break;
 	}
 }
@@ -156,10 +222,10 @@ inline void inc_cross_c(unsigned int type, unsigned int dir) {
 inline void done_inc_cross_c(unsigned int type, unsigned int dir) { 
 	switch (dir) {
 		case HORIZONTAL:
-			state_c.crossing_e[type] -= 1;
+			state_c.crossing_h[type] -= 1;
 			break;
 		case VERTICAL:
-			state_c.crossing_n[type] -= 1;
+			state_c.crossing_v[type] -= 1;
 			break;
 	}
 }
@@ -167,10 +233,10 @@ inline void done_inc_cross_c(unsigned int type, unsigned int dir) {
 inline void waiting_c(unsigned int type, unsigned int dir) {
 	switch (dir) {
 		case HORIZONTAL:
-			state_c.waiting_e[type] += 1;
+			state_c.waiting_h[type] += 1;
 			break;
 		case VERTICAL:
-			state_c.waiting_n[type] += 1;
+			state_c.waiting_v[type] += 1;
 			break;
 	}
 }
@@ -178,10 +244,10 @@ inline void waiting_c(unsigned int type, unsigned int dir) {
 inline void not_waiting_c(unsigned int type, unsigned int dir) {
 	switch (dir) {
 		case HORIZONTAL:
-			state_c.waiting_e[type] -= 1;
+			state_c.waiting_h[type] -= 1;
 			break;
 		case VERTICAL:
-			state_c.waiting_n[type] -= 1;
+			state_c.waiting_v[type] -= 1;
 			break;
 	}
 }
