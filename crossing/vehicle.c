@@ -6,7 +6,7 @@ void * enter_v(void * argp) {
 }
 
 void * enter_v_c(void * argp) {
-	try_cross_veh(rand() % 2);
+	try_cross_c(VEHICLE, rand() % 2);
 	return argp;
 }
 

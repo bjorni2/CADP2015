@@ -7,7 +7,7 @@ void * enter_p(void * argp)
 }
 
 void * enter_p_c(void * argp) {
-	try_cross_ped(rand() % 2);
+	try_cross_c(PEDESTRIAN, rand() % 2);
 	return argp;
 }
 

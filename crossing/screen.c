@@ -186,7 +186,7 @@ void insert_critical_c1(char * buf, struct crossing * c) {
 	make_roadline_d(line);
 	make_roadline_h2(line);
 	memset(line + 19, 'P', 1);
-	opt_side2line(line, c->crossing[HORIZONTAL][PEDESTRIAN]);
+	opt_side2line(line, c->crossing[VERTICAL][PEDESTRIAN]);
 	ins_to_buf(buf, line);
 	make_line(line);
 	make_roadline_h2(line);
@@ -202,7 +202,7 @@ void insert_critical_c1(char * buf, struct crossing * c) {
 	make_roadline(line);
 	memset(line + 18, 'p', 1);
 	memset(line + 19, ':', 1);
-	opt_side2line(line, c->waiting[HORIZONTAL][PEDESTRIAN]);
+	opt_side2line(line, c->waiting[VERTICAL][PEDESTRIAN]);
 	ins_to_buf(buf, line);
 	free(line);
 }
@@ -337,6 +337,7 @@ void * draw_c(void * argp) {
 	while(atomic_load(&SCREEN_DRAWING_ENABLED)) {
 		draw_crossing(screen, c);
 	}
+	milli_sleep(1000);
 	draw_crossing(screen, c);
 	free(screen);
 	return NULL;

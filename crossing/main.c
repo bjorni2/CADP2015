@@ -81,6 +81,7 @@ int main(int argc, char * argv[]) {
 void int_handler(int sig) {
 	PROG_RUNNING = 0;
 	fprintf(stderr, "Received signal %d, terminating...", sig);
+	draw_stop();
 }
 
 void fatal_error(const char * msg) {
