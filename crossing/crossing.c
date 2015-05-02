@@ -39,7 +39,6 @@ void start_c(unsigned int k, size_t MAX_SPAWNS) {
 	while (true) {
 		bool stop = true;
 		milli_sleep(2);	
-//		log_sem(-1);
 		for (i = 0; i < MAX_TYPE; ++i) {
 			if (atomic_load(&(state_c.waiting_v[i]))) stop = false;
 			if (atomic_load(&(state_c.crossing_v[i]))) stop = false;
@@ -56,6 +55,7 @@ void start_c(unsigned int k, size_t MAX_SPAWNS) {
 
 void * spawner_c(void * argp) {
 	size_t i, MAX_SPAWNS = (size_t) argp;
+	unsigned int v=0,p=0;
 	char * msg = malloc(MSG_SIZE);
 	sprintf(msg, "Spawner initialized: %lu", MAX_SPAWNS);
 	log_action(msg);
@@ -66,12 +66,17 @@ void * spawner_c(void * argp) {
 		pthread_t pt;
 		if (x < 0.5) {
 			pthread_create(&pt, NULL, enter_v_c, NULL);	
+			v++;
 		} else { 
 			pthread_create(&pt, NULL, enter_p_c, NULL);
+			p++;
 		}
 		milli_sleep(10);
 		pthread_detach(pt);
 	}
+
+	sprintf(msg, "Spawned %u vehicles and %u pedestrians.", v, p);
+	log_action(msg);
 
 	free(msg);
 	return NULL;
@@ -207,48 +212,75 @@ void signal_c(){
 	}
 }*/
 
-// TODO: log
 inline void inc_cross_c(unsigned int type, unsigned int dir) {
+	char *msg = malloc(MSG_SIZE);
+	unsigned int crossers = 0;
 	switch (dir) {
 		case HORIZONTAL:
 			state_c.crossing_h[type] += 1;
+			crossers = state_c.crossing_h[type];
 			break;
 		case VERTICAL:
 			state_c.crossing_v[type] += 1;
+			crossers = state_c.crossing_v[type];
 			break;
 	}
+	sprintf(msg, "%u, %u +CROSS [%u crossing]", type, dir, crossers);
+	log_actionl(msg, 0);
+	free(msg);
 }
 
 inline void done_inc_cross_c(unsigned int type, unsigned int dir) { 
+	char *msg = malloc(MSG_SIZE);
+	unsigned int crossers = 0;
 	switch (dir) {
 		case HORIZONTAL:
 			state_c.crossing_h[type] -= 1;
+			crossers = state_c.crossing_h[type];
 			break;
 		case VERTICAL:
 			state_c.crossing_v[type] -= 1;
+			crossers = state_c.crossing_h[type];
 			break;
 	}
+	sprintf(msg, "%u, %u -CROSS [%u crossing]", type, dir, crossers);
+	log_actionl(msg, 0);
+	free(msg);
 }
 
 inline void waiting_c(unsigned int type, unsigned int dir) {
+	char *msg = malloc(MSG_SIZE);
+	unsigned int waiters = 0;
 	switch (dir) {
 		case HORIZONTAL:
 			state_c.waiting_h[type] += 1;
+			waiters = state_c.waiting_h[type];
 			break;
 		case VERTICAL:
 			state_c.waiting_v[type] += 1;
+			waiters = state_c.waiting_v[type];
 			break;
 	}
+	sprintf(msg, "%u, %u +wait [%u waiting]", type, dir, waiters);
+	log_actionl(msg, 2);
+	free(msg);
 }
 
 inline void not_waiting_c(unsigned int type, unsigned int dir) {
+	char *msg = malloc(MSG_SIZE);
+	unsigned int waiters = 0;
 	switch (dir) {
 		case HORIZONTAL:
 			state_c.waiting_h[type] -= 1;
+			waiters = state_c.waiting_h[type];
 			break;
 		case VERTICAL:
 			state_c.waiting_v[type] -= 1;
+			waiters = state_c.waiting_v[type];
 			break;
 	}
+	sprintf(msg, "%u, %u -wait [%u waiting]", type, dir, waiters);
+	log_actionl(msg, 2);
+	free(msg);
 }
 

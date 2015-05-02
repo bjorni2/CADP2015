@@ -31,12 +31,11 @@ void start_b(unsigned int k, size_t MAX_SPAWNS) {
 	sem_init(&turn_h[PEDESTRIAN], 0, 0);
 	sem_init(&turn_h[VEHICLE], 0, 0);
 
-//	pthread_create(&pt, NULL, spawner_c, ((void *) MAX_SPAWNS));
+	pthread_create(&pt, NULL, spawner_c, ((void *) MAX_SPAWNS));
 
 	while (true) {
 		bool stop = true;
 		milli_sleep(2);	
-//		log_sem(-1);
 		for (i = 0; i < MAX_TYPE; ++i) {
 			if (atomic_load(&(state_b.waiting_n[i]))) stop = false;
 			if (atomic_load(&(state_b.crossing_n[i]))) stop = false;
@@ -48,6 +47,35 @@ void start_b(unsigned int k, size_t MAX_SPAWNS) {
 		}
 	}
 
-//	pthread_join(pt, NULL);
+	pthread_join(pt, NULL);
+}
+
+void * spawner_b(void * argp) {
+	size_t i, MAX_SPAWNS = (size_t) argp;
+	unsigned int v=0,p=0;
+	char * msg = malloc(MSG_SIZE);
+	sprintf(msg, "Spawner initialized: %lu", MAX_SPAWNS);
+	log_action(msg);
+
+	for (i = 0; i < MAX_SPAWNS; i++)
+	{
+		double x = (double) rand() / (double) RAND_MAX;
+//		pthread_t pt;
+		if (x < 0.5) {
+//			pthread_create(&pt, NULL, enter_v_c, NULL);	
+			v++;
+		} else { 
+//			pthread_create(&pt, NULL, enter_p_c, NULL);
+			p++;
+		}
+		milli_sleep(10);
+//		pthread_detach(pt);
+	}
+
+	sprintf(msg, "Spawned %u vehicles and %u pedestrians.", v, p);
+	log_action(msg);
+
+	free(msg);
+	return NULL;
 }
 

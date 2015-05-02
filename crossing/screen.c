@@ -181,18 +181,18 @@ void insert_critical_c1(char * buf, struct crossing * c) {
 	make_line(line);
 	make_roadline_h2(line);
 	memset(line + 19, 'V', 1);
-	opt_side2line(line, c->crossing_e[VEHICLE]);
+	opt_side2line(line, c->crossing_h[VEHICLE]);
 	ins_to_buf(buf, line);
 	make_roadline_d(line);
 	make_roadline_h2(line);
 	memset(line + 19, 'P', 1);
-	opt_side2line(line, c->crossing_e[PEDESTRIAN]);
+	opt_side2line(line, c->crossing_h[PEDESTRIAN]);
 	ins_to_buf(buf, line);
 	make_line(line);
 	make_roadline_h2(line);
 	memset(line + 12, 'v', 1);
 	memset(line + 13, ':', 1);
-	opt_generic_line(line, c->waiting_e[VEHICLE], 17);
+	opt_generic_line(line, c->waiting_h[VEHICLE], 17);
 	ins_to_buf(buf, line);
 	make_roadline_h(line);
 	make_roadline_h2(line);
@@ -202,7 +202,7 @@ void insert_critical_c1(char * buf, struct crossing * c) {
 	make_roadline(line);
 	memset(line + 18, 'p', 1);
 	memset(line + 19, ':', 1);
-	opt_side2line(line, c->waiting_e[PEDESTRIAN]);
+	opt_side2line(line, c->waiting_h[PEDESTRIAN]);
 	ins_to_buf(buf, line);
 	free(line);
 }
@@ -214,25 +214,26 @@ void insert_critical_c2(char * buf, struct crossing * c) {
 	memset(line + 32, 'V', 1);
 	memset(line + 43, 'p', 1);
 	memset(line + 44, ':', 1);
-	opt_into_line(line, c->crossing_n[VEHICLE]);
-	opt_side_line(line, c->waiting_e[PEDESTRIAN]);
+	opt_into_line(line, c->crossing_v[VEHICLE]);
+	opt_side_line(line, c->waiting_h[PEDESTRIAN]);
 	ins_to_buf(buf, line);
 	make_roadline(line);
 	memset(line + 32, 'P', 1);
 	memset(line + 36, '|', 1);
-	opt_into_line(line, c->crossing_e[PEDESTRIAN]);
+	opt_into_line(line, c->crossing_h[PEDESTRIAN]);
 	ins_to_buf(buf, line);
 	insert_segment(buf, SEG_WALK);
 	make_roadline(line);
 	memset(line + 32, 'v', 1);
 	memset(line + 33, ':', 1);
-	opt_into_line(line, c->waiting_n[VEHICLE]);
+	opt_into_line(line, c->waiting_v[VEHICLE]);
 	ins_to_buf(buf, line);
 	free(line);
 }
 
 void insert_critical_b1(char * buf, struct busy * b) {
 	char * line = malloc(WIDTH+1);
+	memset(line + 1, (unsigned long) b & 0x1, 1); // TODO: REMOVE!!
 	make_roadline_h(line);
 	memset(line + 39, '/', 1);
 	ins_to_buf(buf, line);
@@ -273,6 +274,7 @@ void insert_critical_b1(char * buf, struct busy * b) {
 
 void insert_critical_b2(char * buf, struct busy * b) {
 	char * line = malloc(WIDTH+1);
+	memset(line + 1, (unsigned long) b & 0x1, 1); // TODO: REMOVE!!
 	insert_segment(buf, SEG_WALK);
 	make_roadline(line);
 	memset(line + 32, 'V', 1);
