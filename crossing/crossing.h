@@ -51,3 +51,5 @@ inline void inc_cross_c(unsigned int type, unsigned int dir);
 inline void done_inc_cross_c(unsigned int type, unsigned int dir);
 inline void waiting_c(unsigned int type, unsigned int dir);
 inline void not_waiting_c(unsigned int type, unsigned int dir);
+
+void log_sem_c();

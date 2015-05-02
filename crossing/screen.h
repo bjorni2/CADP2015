@@ -12,7 +12,7 @@
 #include "busy.h"
 
 #define WIDTH 79
-#define LINES 24
+#define LINES 240
 #define SEG_TOP    0
 #define SEG_BOTTOM 1
 #define SEG_ROAD   2
@@ -36,11 +36,13 @@ void opt_side_line(char * line, unsigned int num);
 void opts_side2_line(char * line, unsigned int num);
 void opt_generic_line(char * line, unsigned int num, unsigned int pos);
 
-void insert_critical_s(char *buf, struct simple * s);
+void insert_critical_s(char * buf, struct simple * s);
 void insert_critical_c1(char * buf, struct crossing * c);
 void insert_critical_c2(char * buf, struct crossing * c);
-void insert_critical_b1(char *buf, struct busy * b);
-void insert_critical_b2(char *buf, struct busy * b);
+void insert_critical_b1(char * buf, struct busy * b);
+void insert_critical_b2(char * buf, struct busy * b);
+
+void insert_statusline_c(char * buf, struct crossing * c);
 
 void * draw_s(void * argp);
 void * draw_c(void * argp);

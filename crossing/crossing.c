@@ -23,7 +23,7 @@ void start_c(unsigned int k, size_t MAX_SPAWNS) {
 		state_c.crossing_h[i] = 0;
 		state_c.waiting_v[i] = 0;
 		state_c.waiting_h[i] = 0;
-		state_c.k[i] = 0;
+		state_c.k[i] = 1;
 		state_c.last[i] = true;
 	}
 	state_c.last_pv = true;
@@ -83,8 +83,9 @@ void * spawner_c(void * argp) {
 }
 
 void try_cross_ped(unsigned int dir){
+	log_sem_c();
 	sem_wait(&light_c);
-	if((dir == VERTICAL && state_c.crossing_h[VEHICLE] != 0) || state_c.k[HORIZONTAL] == 0){
+	if(dir == VERTICAL && (state_c.crossing_h[VEHICLE] != 0 || state_c.k[HORIZONTAL] == 0)) {
 		waiting_c(PEDESTRIAN, dir);
 		if(state_c.waiting_v[VEHICLE] == 0 && state_c.waiting_v[PEDESTRIAN] == 1){
 			state_c.k[VERTICAL] = K_c;
@@ -92,7 +93,7 @@ void try_cross_ped(unsigned int dir){
 		sem_post(&light_c);
 		sem_wait(&turn_v[PEDESTRIAN]);
 	}
-	else if((dir == HORIZONTAL && state_c.crossing_v[VEHICLE] != 0) || state_c.k[VERTICAL] == 0){
+	else if (dir == HORIZONTAL && (state_c.crossing_v[VEHICLE] != 0 || state_c.k[VERTICAL] == 0)) {
 		waiting_c(PEDESTRIAN, dir);
 		if(state_c.waiting_h[VEHICLE] == 0 && state_c.waiting_h[PEDESTRIAN] == 1){
 			state_c.k[HORIZONTAL] = K_c;
@@ -139,10 +140,10 @@ void try_cross_ped(unsigned int dir){
 	}
 }
 
-
 void try_cross_veh(unsigned int dir){
+	log_sem_c();
 	sem_wait(&light_c);
-	if((dir == VERTICAL && (state_c.crossing_h[VEHICLE] != 0 || state_c.crossing_h[PEDESTRIAN] != 0)) || state_c.k[HORIZONTAL] == 0){
+	if (dir == VERTICAL && ((state_c.crossing_h[VEHICLE] != 0 || state_c.crossing_h[PEDESTRIAN] != 0) || state_c.k[HORIZONTAL] == 0)) {
 		waiting_c(VEHICLE, dir);
 		if(state_c.waiting_v[PEDESTRIAN] == 0 && state_c.waiting_v[VEHICLE] == 1){
 			state_c.k[VERTICAL] = K_c;
@@ -150,7 +151,7 @@ void try_cross_veh(unsigned int dir){
 		sem_post(&light_c);
 		sem_wait(&turn_v[VEHICLE]);
 	}
-	else if((dir == HORIZONTAL && (state_c.crossing_v[VEHICLE] != 0 || state_c.crossing_v[PEDESTRIAN] != 0)) || state_c.k[VERTICAL] == 0){
+	else if (dir == HORIZONTAL && ((state_c.crossing_v[VEHICLE] != 0 || state_c.crossing_v[PEDESTRIAN] != 0) || state_c.k[VERTICAL] == 0)) {
 		waiting_c(VEHICLE, dir);
 		if(state_c.waiting_h[PEDESTRIAN] == 0 && state_c.waiting_h[VEHICLE] == 1){
 			state_c.k[HORIZONTAL] = K_c;
@@ -166,9 +167,7 @@ void try_cross_veh(unsigned int dir){
 		state_c.k[VERTICAL]--;
 	}
 	
-	
 	inc_cross_c(VEHICLE, dir);
-	
 	
 	if(dir == VERTICAL && (state_c.waiting_h[VEHICLE] > 0 || state_c.waiting_h[PEDESTRIAN]) && state_c.k[HORIZONTAL] == 0){ // Ef k er 0 megum við bara opna light_s
 		sem_post(&light_s);
@@ -210,6 +209,7 @@ void try_cross_veh(unsigned int dir){
 }
 
 void signal_c(){
+	log_sem_c();
 	if(state_c.waiting_v[VEHICLE] > 0 && state_c.crossing_h[VEHICLE] == 0 && state_c.crossing_h[PEDESTRIAN] == 0){
 		if(state_c.waiting_v[PEDESTRIAN] > 0){
 			if(state_c.last[VERTICAL] == true){
@@ -364,6 +364,34 @@ inline void not_waiting_c(unsigned int type, unsigned int dir) {
 	}
 	sprintf(msg, "%u, %u -wait [%u waiting]", type, dir, waiters);
 	log_actionl(msg, 2);
+	free(msg);
+}
+
+void log_sem_c() {
+	char * msg = malloc(MSG_SIZE);
+	int l, v0, v1, h0, h1;
+	sem_getvalue(&light_c, &l);
+	sem_getvalue(&turn_v[0], &v0);
+	sem_getvalue(&turn_v[1], &v1);
+	sem_getvalue(&turn_h[0], &h0);
+	sem_getvalue(&turn_h[1], &h1);
+	sprintf(msg, "[L, V0, V1, H0, H1]: %d %d %d %d %d", l, v0, v1, h0, h1);
+	log_actionl(msg, 4);
+//	sprintf(msg, "S: CV0, CV1, CH0, CH1, WV0, WV1, WH0, WH1, KV, KH");
+//	log_actionl(msg, 4);
+	sprintf(msg, "S: %3u, %3u, %3u, %3u, %3u, %3u, %3u, %3u, %2u, %2u",
+			state_c.crossing_v[0],
+			state_c.crossing_v[1],
+			state_c.crossing_h[0],
+			state_c.crossing_h[1],
+			state_c.waiting_v[0],
+			state_c.waiting_v[1],
+			state_c.waiting_h[0],
+			state_c.waiting_h[1],
+			state_c.k[0],
+			state_c.k[1]
+			);
+	log_actionl(msg, 12);
 	free(msg);
 }
 
