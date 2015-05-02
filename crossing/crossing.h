@@ -22,6 +22,8 @@
 #define VERTICAL   0
 #define HORIZONTAL 1
 
+#define _LL_SEM_WAIT(x) _LSEM_WAIT(x) ; log_sem_c(NULL)
+#define _LL_SEM_POST(x) _LSEM_POST(x) ; log_sem_c(NULL)
 
 struct crossing {
 	unsigned int crossing[2][MAX_TYPE];
@@ -45,9 +47,11 @@ void * spawner_c(void * argp);
 
 void signal_c();
 
+inline bool can_cross_c(unsigned int type, unsigned int dir);
+
 inline void inc_cross_c(unsigned int type, unsigned int dir);
 inline void done_inc_cross_c(unsigned int type, unsigned int dir);
 inline void waiting_c(unsigned int type, unsigned int dir);
 inline void not_waiting_c(unsigned int type, unsigned int dir);
 
-void log_sem_c();
+void log_sem_c(const char * append);

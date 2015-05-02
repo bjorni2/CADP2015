@@ -12,7 +12,7 @@ run: $(TARGET)
 	./$(TARGET) simple
 
 ext: $(TARGET)
-	./$(TARGET) extended
+	./$(TARGET) extended 2 10
 
 busy: $(TARGET)
 	./$(TARGET) busy

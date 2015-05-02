@@ -31,3 +31,26 @@ void nano_sleep(unsigned int nanoseconds){
 	rem.tv_nsec = 0;
 	nanosleep(&t, &rem);
 }
+
+int Lsem_wait(sem_t * sem, const char * name, int lineno) {
+	int retval;
+	retval = sem_wait(sem);
+	if (retval == 0) {
+		log_sem_wait(name, lineno);
+	} else {
+		log_sem_error(name, lineno);
+	}
+	return retval;
+}
+
+int Lsem_post(sem_t * sem, const char * name, int lineno) {
+	int retval;
+	retval = sem_post(sem);
+	if (retval == 0) {
+		log_sem_post(name, lineno);
+	} else {
+		log_sem_error(name, lineno);
+	}
+	return retval;
+}
+
