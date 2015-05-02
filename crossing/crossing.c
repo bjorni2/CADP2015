@@ -193,6 +193,9 @@ void signal_c(unsigned int type, unsigned int dir) {
 	} else if (ped_nodir) {
 		not_waiting_c(PEDESTRIAN, !dir);
 		_LL_SEM_POST(&turn_c[!dir][PEDESTRIAN]);
+	} else if (state_c.waiting[!dir][VEHICLE] > 0 && !state_c.crossing[dir][VEHICLE] && !state_c.crossing[dir][PEDESTRIAN]) {
+		not_waiting_c(VEHICLE, !dir);
+		_LL_SEM_POST(&turn_c[!dir][VEHICLE]);
 	} else {
 		_LL_SEM_POST(&light_c);
 	}
@@ -207,6 +210,9 @@ inline bool leaving_crossing_c(unsigned int type, unsigned int dir) {
 	}
 
 	if (last) {
+		if (type == PEDESTRIAN && state_c.crossing[!dir][type] > 0) {
+			return false;
+		}
 		for (i = 0; i < MAX_TYPE; ++i) {
 			if (state_c.waiting[!dir][i]) {
 				state_c.k[!dir] = K_c;
