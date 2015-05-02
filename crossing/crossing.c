@@ -7,6 +7,8 @@ unsigned int K_c;
 sem_t light_c;
 sem_t turn_v[MAX_TYPE];
 sem_t turn_h[MAX_TYPE];
+bool pv_last = true;
+bool ph_last = true;
 
 void start_b(unsigned int k, size_t MAX_SPAWNS) {
 	unsigned int i;
@@ -121,6 +123,16 @@ void try_cross_veh(unsigned int dir){
 
 void signal_c(){
 	if(state_c.waiting_n[VEHICLE] > 0 && state_c.crossing_e[VEHICLE] == 0 && state_c.crossing_e[PEDESTRIAN] == 0){
+		if(state_c.waiting_n[PEDESTRIAN] > 0){
+			if(pv_last == true){
+				not_waiting_c(VEHICLE, VERTICAL);
+				sem_post(&turn_v[VEHICLE]);
+			}
+			else{
+				
+			}
+		}
+		
 		not_waiting_c(VEHICLE, VERTICAL);
 		sem_post(&turn_v[VEHICLE]);
 	}
@@ -140,6 +152,28 @@ void signal_c(){
 		sem_post(&light_c);
 	}
 }
+
+/*void signal_c(){
+	if(state_c.waiting_n[VEHICLE] > 0 && state_c.crossing_e[VEHICLE] == 0 && state_c.crossing_e[PEDESTRIAN] == 0){
+		not_waiting_c(VEHICLE, VERTICAL);
+		sem_post(&turn_v[VEHICLE]);
+	}
+	else if(state_c.waiting_n[PEDESTRIAN] > 0 && state_c.crossing_e[VEHICLE] == 0){
+		not_waiting_c(PEDESTRIAN, VERTICAL);
+		sem_post(&turn_v[PEDESTRIAN]);
+	}
+	else if(state_c.waiting_e[VEHICLE] > 0 && state_c.crossing_n[VEHICLE] == 0 && state_c.crossing_n[PEDESTRIAN] == 0){
+		not_waiting_c(VEHICLE, HORIZONTAL);
+		sem_post(&turn_h[VEHICLE]);
+	}
+	else if(state_c.waiting_e[PEDESTRIAN] > 0 && state_c.crossing_n[VEHICLE] == 0){
+		not_waiting_c(PEDESTRIAN, HORIZONTAL);
+		sem_post(&turn_h[PEDESTRIAN]);
+	}
+	else{
+		sem_post(&light_c);
+	}
+}*/
 
 // TODO: log
 inline void inc_cross_c(unsigned int type, unsigned int dir) {

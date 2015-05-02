@@ -35,6 +35,8 @@ extern unsigned int K_c;
 extern sem_t light_c;
 extern sem_t turn_v[MAX_TYPE];
 extern sem_t turn_h[MAX_TYPE];
+extern bool pv_last;
+extern bool ph_last;
 
 void try_cross_ped(unsigned int dir);
 void try_cross_veh(unsigned int dir);
