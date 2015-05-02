@@ -12,8 +12,7 @@ void * enter_p_c(void * argp) {
 }
 
 void * enter_p_b(void * argp) {
-// TODO: randomize direction
-//	try_cross_c();
+	try_cross_b(PEDESTRIAN, rand() % 2);
 	return argp;
 }
 

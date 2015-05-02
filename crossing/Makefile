@@ -15,7 +15,7 @@ ext: $(TARGET)
 	./$(TARGET) extended 2 10
 
 busy: $(TARGET)
-	./$(TARGET) busy
+	./$(TARGET) busy 2 10
 
 clean:
 	rm $(TARGET)

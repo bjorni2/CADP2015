@@ -11,8 +11,7 @@ void * enter_v_c(void * argp) {
 }
 
 void * enter_v_b(void * argp) {
-//	try_cross_c();
-// TODO: randomize direction
+	try_cross_b(VEHICLE, rand() % 2);
 	return argp;
 }
 
