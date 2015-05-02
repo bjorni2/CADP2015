@@ -181,18 +181,18 @@ void insert_critical_c1(char * buf, struct crossing * c) {
 	make_line(line);
 	make_roadline_h2(line);
 	memset(line + 19, 'V', 1);
-	opt_side2line(line, c->crossing_h[VEHICLE]);
+	opt_side2line(line, c->crossing[HORIZONTAL][VEHICLE]);
 	ins_to_buf(buf, line);
 	make_roadline_d(line);
 	make_roadline_h2(line);
 	memset(line + 19, 'P', 1);
-	opt_side2line(line, c->crossing_h[PEDESTRIAN]);
+	opt_side2line(line, c->crossing[HORIZONTAL][PEDESTRIAN]);
 	ins_to_buf(buf, line);
 	make_line(line);
 	make_roadline_h2(line);
 	memset(line + 12, 'v', 1);
 	memset(line + 13, ':', 1);
-	opt_generic_line(line, c->waiting_h[VEHICLE], 17);
+	opt_generic_line(line, c->waiting[HORIZONTAL][VEHICLE], 17);
 	ins_to_buf(buf, line);
 	make_roadline_h(line);
 	make_roadline_h2(line);
@@ -202,7 +202,7 @@ void insert_critical_c1(char * buf, struct crossing * c) {
 	make_roadline(line);
 	memset(line + 18, 'p', 1);
 	memset(line + 19, ':', 1);
-	opt_side2line(line, c->waiting_h[PEDESTRIAN]);
+	opt_side2line(line, c->waiting[HORIZONTAL][PEDESTRIAN]);
 	ins_to_buf(buf, line);
 	free(line);
 }
@@ -214,19 +214,19 @@ void insert_critical_c2(char * buf, struct crossing * c) {
 	memset(line + 32, 'V', 1);
 	memset(line + 43, 'p', 1);
 	memset(line + 44, ':', 1);
-	opt_into_line(line, c->crossing_v[VEHICLE]);
-	opt_side_line(line, c->waiting_h[PEDESTRIAN]);
+	opt_into_line(line, c->crossing[VERTICAL][VEHICLE]);
+	opt_side_line(line, c->waiting[HORIZONTAL][PEDESTRIAN]);
 	ins_to_buf(buf, line);
 	make_roadline(line);
 	memset(line + 32, 'P', 1);
 	memset(line + 36, '|', 1);
-	opt_into_line(line, c->crossing_h[PEDESTRIAN]);
+	opt_into_line(line, c->crossing[HORIZONTAL][PEDESTRIAN]);
 	ins_to_buf(buf, line);
 	insert_segment(buf, SEG_WALK);
 	make_roadline(line);
 	memset(line + 32, 'v', 1);
 	memset(line + 33, ':', 1);
-	opt_into_line(line, c->waiting_v[VEHICLE]);
+	opt_into_line(line, c->waiting[VERTICAL][VEHICLE]);
 	ins_to_buf(buf, line);
 	free(line);
 }
@@ -264,7 +264,7 @@ void insert_critical_b1(char * buf, struct busy * b) {
 	memset(line + 34, 'P', 1);
 	memset(line + 12, 'v', 1);
 	memset(line + 13, ':', 1);
-//	opt_generic_line(line, c->waiting_h[VEHICLE], 17);
+//	opt_generic_line(line, c->waiting[HORIZONTAL][VEHICLE], 17);
 	// opts_inside_line(line, ??);
 	ins_to_buf(buf, line);
 	make_roadline_h(line);

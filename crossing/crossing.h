@@ -23,10 +23,8 @@
 
 
 struct crossing {
-	unsigned int crossing_v[2];
-	unsigned int crossing_h[2];
-	unsigned int waiting_v[2];
-	unsigned int waiting_h[2];
+	unsigned int crossing[2][MAX_TYPE];
+	unsigned int waiting[2][MAX_TYPE];
 	unsigned int k[2]; // beware dragons
 	bool last[2]; // index is direction, if true pedestrian crossed last.
 	bool last_pv;
@@ -35,8 +33,7 @@ struct crossing {
 extern bool started_c;
 extern unsigned int K_c;
 extern sem_t light_c;
-extern sem_t turn_v[MAX_TYPE];
-extern sem_t turn_h[MAX_TYPE];
+extern sem_t turn_c[2][MAX_TYPE];
 
 void try_cross_ped(unsigned int dir);
 void try_cross_veh(unsigned int dir);
