@@ -113,6 +113,8 @@ void try_cross_ped(unsigned int dir){
 		state_c.k[!dir] = K_c;
 		not_waiting_c(VEHICLE, !dir);
 		sem_post(&turn_c[!dir][VEHICLE]);
+	} else if(state_c.waiting[!dir][VEHICLE] > 0 && state_c.k[!dir] == 0) { 
+		sem_post(&light_c);
 	} else {
 		signal_c();
 	}
@@ -155,7 +157,10 @@ void try_cross_veh(unsigned int dir){
 			state_c.k[!dir] = K_c;
 			not_waiting_c(PEDESTRIAN, !dir);
 			sem_post(&turn_c[!dir][PEDESTRIAN]);
-	} else {
+	} else if(state_c.waiting[!dir][PEDESTRIAN] > 0 && state_c.k[!dir] == 0) {
+		sem_post(&light_c);
+	}
+	else {
 		signal_c();
 	}
 }
