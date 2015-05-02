@@ -29,7 +29,7 @@ void start_s(unsigned int k, size_t MAX_SPAWNS) {
 	state_s.turn = VEHICLE;
 	pthread_create(&pt, NULL, spawner_s, ((void *) MAX_SPAWNS));
 
-	while (true) {
+	while (PROG_RUNNING) {
 		bool stop = true;
 		milli_sleep(2);	
 //		log_sem(-1);

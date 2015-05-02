@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +14,9 @@
 
 void fatal_error(const char * msg);
 bool is_number(char * str);
+void int_handler(int sig);
+
+volatile sig_atomic_t PROG_RUNNING = 1;
 
 int main(int argc, char * argv[]) {
 	int i, n1=0, n2=0;
@@ -23,6 +27,7 @@ int main(int argc, char * argv[]) {
 	if (argc < 2) {
 		fatal_error("Missing argument.");
 	}
+	signal(SIGINT, int_handler);
 	fp = fopen("log.txt", "w");
 	init_log(fp);
 
@@ -71,6 +76,11 @@ int main(int argc, char * argv[]) {
 
 	fclose(fp);
 	return 0;
+}
+
+void int_handler(int sig) {
+	PROG_RUNNING = 0;
+	fprintf(stderr, "Received signal %d, terminating...", sig);
 }
 
 void fatal_error(const char * msg) {

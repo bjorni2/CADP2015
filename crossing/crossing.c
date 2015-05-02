@@ -36,7 +36,7 @@ void start_c(unsigned int k, size_t MAX_SPAWNS) {
 
 	pthread_create(&pt, NULL, spawner_c, ((void *) MAX_SPAWNS));
 
-	while (true) {
+	while (PROG_RUNNING) {
 		bool stop = true;
 		milli_sleep(2);	
 		for (i = 0; i < MAX_TYPE; ++i) {
@@ -83,7 +83,6 @@ void * spawner_c(void * argp) {
 }
 
 void try_cross_ped(unsigned int dir){
-	log_sem_c();
 	sem_wait(&light_c);
 	if (state_c.crossing[!dir][VEHICLE] != 0 || state_c.k[!dir] == 0) {
 		waiting_c(PEDESTRIAN, dir);
@@ -119,7 +118,6 @@ void try_cross_ped(unsigned int dir){
 }
 
 void try_cross_veh(unsigned int dir){
-	log_sem_c();
 	sem_wait(&light_c);
 	if ((state_c.crossing[!dir][VEHICLE] != 0 || state_c.crossing[!dir][PEDESTRIAN] != 0) || state_c.k[!dir] == 0) {
 		waiting_c(VEHICLE, dir);

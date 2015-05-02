@@ -33,7 +33,7 @@ void start_b(unsigned int k, size_t MAX_SPAWNS) {
 
 	pthread_create(&pt, NULL, spawner_b, ((void *) MAX_SPAWNS));
 
-	while (true) {
+	while (PROG_RUNNING) {
 		bool stop = true;
 		milli_sleep(2);	
 		for (i = 0; i < MAX_TYPE; ++i) {
