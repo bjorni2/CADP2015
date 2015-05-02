@@ -12,7 +12,7 @@ void * enter_p_c(void * argp) {
 }
 
 void * enter_p_b(void * argp) {
-	try_cross_b(PEDESTRIAN, rand() % 2);
+	try_cross_b(PEDESTRIAN, rand() % 3);
 	return argp;
 }
 

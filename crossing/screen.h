@@ -43,6 +43,7 @@ void insert_critical_b1(char * buf, struct busy * b);
 void insert_critical_b2(char * buf, struct busy * b);
 
 void insert_statusline_c(char * buf, struct crossing * c);
+void insert_statusline_b(char * buf, struct busy * c);
 
 void * draw_s(void * argp);
 void * draw_c(void * argp);

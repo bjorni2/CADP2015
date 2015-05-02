@@ -312,6 +312,13 @@ void insert_statusline_c(char * buf, struct crossing * c) {
 	free(line);
 }
 
+void insert_statusline_b(char * buf, struct busy * c) {
+	char * line = malloc(WIDTH+1);
+	sprintf(line, "k:[%u, %u]\n", c->k[0], c->k[1]);
+	ins_to_buf(buf, line);
+	free(line);
+}
+
 void * draw_s(void * argp) {
 	struct simple * s = argp;
 	char * screen = malloc(WIDTH * LINES);
@@ -399,6 +406,7 @@ void draw_busy(char * screen, struct busy * s) {
 	insert_segment(screen, SEG_ROADS);
 	insert_segment(screen, SEG_ROAD);
 	insert_segment(screen, SEG_BOTTOM);
+	insert_statusline_b(screen, s);
 	draw_buf(screen);
 }
 

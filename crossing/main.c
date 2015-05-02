@@ -82,6 +82,8 @@ void int_handler(int sig) {
 	PROG_RUNNING = 0;
 	fprintf(stderr, "Received signal %d, terminating...", sig);
 	draw_stop();
+	milli_sleep(5000);
+	fatal_error("Something went wrong in terminating the program!");
 }
 
 void fatal_error(const char * msg) {

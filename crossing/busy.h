@@ -22,6 +22,7 @@
 #define VERTICAL   0
 #define HORIZONTAL 1
 #define DIAGONAL   2
+#define MAX_DIR    3
 
 #define _LLB_SEM_WAIT(x) _LSEM_WAIT(x) ; log_sem_b(NULL)
 #define _LLB_SEM_POST(x) _LSEM_POST(x) ; log_sem_b(NULL)
@@ -30,8 +31,7 @@ struct busy {
 	unsigned int crossing[3][MAX_TYPE];
 	unsigned int waiting[3][MAX_TYPE];
 	unsigned int k[3]; // beware dragons
-	bool last[2]; // 0: chosen p-dir, 1: p vs v winner
-	bool last_pv;
+	bool last[3]; // 0: chosen p-dir, 1: p vs v winner
 } state_b;
 
 extern bool started_b;
@@ -51,10 +51,13 @@ inline void push_button_b(unsigned int dir);
 inline bool leaving_crossing_b(unsigned int dir, unsigned int type);
 inline bool can_cross_b(unsigned int type, unsigned int dir);
 inline bool dec_k_b(unsigned int type, unsigned int dir);
+inline bool blocked_b(unsigned int dir);
 
 inline void inc_cross_b(unsigned int type, unsigned int dir);
 inline void done_inc_cross_b(unsigned int type, unsigned int dir);
 inline void waiting_b(unsigned int type, unsigned int dir);
 inline void not_waiting_b(unsigned int type, unsigned int dir);
 
+
+bool nobody_waiting();
 void log_sem_b(const char * append);

@@ -61,6 +61,7 @@ void start_c(unsigned int k, size_t MAX_SPAWNS) {
 
 	if (!PROG_RUNNING) {
 		pthread_cancel(pt);
+		return;
 	}
 
 	pthread_join(pt, NULL);
@@ -127,7 +128,7 @@ void try_cross_c(unsigned int type, unsigned int dir) {
 }
 
 void signal_c(unsigned int type, unsigned int dir) {
-	int i,j;
+	int i,j = type;
 	bool waiting_c[2] = { false, false };
 	bool flag1 = false, flag2 = false;
 	bool ped_dir = false, ped_nodir = false, veh_dir = false;
