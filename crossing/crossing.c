@@ -164,7 +164,7 @@ void try_cross_veh(unsigned int dir){
 }
 
 void signal_c(){
-	log_sem_c();
+	log_sem_c("signal");
 	if(state_c.waiting[VERTICAL][VEHICLE] > 0 && state_c.crossing[HORIZONTAL][VEHICLE] == 0 && state_c.crossing[HORIZONTAL][PEDESTRIAN] == 0) {
 		if(state_c.waiting[VERTICAL][PEDESTRIAN] > 0) {
 			if(state_c.last[VERTICAL] == true){
@@ -295,7 +295,7 @@ inline void not_waiting_c(unsigned int type, unsigned int dir) {
 	free(msg);
 }
 
-void log_sem_c() {
+void log_sem_c(const char * append) {
 	char * msg = malloc(MSG_SIZE);
 	int l, v0, v1, h0, h1;
 	sem_getvalue(&light_c, &l);
@@ -303,10 +303,6 @@ void log_sem_c() {
 	sem_getvalue(&turn_c[VERTICAL][1], &v1);
 	sem_getvalue(&turn_c[HORIZONTAL][0], &h0);
 	sem_getvalue(&turn_c[HORIZONTAL][1], &h1);
-//	sprintf(msg, "[L, V0, V1, H0, H1]: %d %d %d %d %d", l, v0, v1, h0, h1);
-//	log_actionl(msg, 4);
-//	sprintf(msg, "S: CV0, CV1, CH0, CH1, WV0, WV1, WH0, WH1, KV, KH");
-//	log_actionl(msg, 4);
 	sprintf(msg, "S: %3u, %3u, %3u, %3u, %3u, %3u, %3u, %3u, %2u, %2u, [%d %d %d %d %d]",
 			state_c.crossing[VERTICAL][0],
 			state_c.crossing[VERTICAL][1],
@@ -319,6 +315,9 @@ void log_sem_c() {
 			state_c.k[0],
 			state_c.k[1],
 			l, v0, v1, h0, h1);
+	if (append) {
+		strncat(msg, append, MSG_SIZE - strlen(msg)-1);
+	}
 	log_actionl(msg, 12);
 	free(msg);
 }
