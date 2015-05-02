@@ -21,6 +21,7 @@
 
 #define VERTICAL   0
 #define HORIZONTAL 1
+#define DIAGONAL   2
 
 #define _LLB_SEM_WAIT(x) _LSEM_WAIT(x) ; log_sem_b(NULL)
 #define _LLB_SEM_POST(x) _LSEM_POST(x) ; log_sem_b(NULL)
@@ -28,7 +29,7 @@
 struct busy {
 	unsigned int crossing[3][MAX_TYPE];
 	unsigned int waiting[3][MAX_TYPE];
-	unsigned int k[2]; // beware dragons
+	unsigned int k[3]; // beware dragons
 	bool last[2]; // 0: chosen p-dir, 1: p vs v winner
 	bool last_pv;
 } state_b;
@@ -36,7 +37,7 @@ struct busy {
 extern bool started_b;
 extern unsigned int K_b;
 extern sem_t light_b;
-extern sem_t turn_b[2][MAX_TYPE];
+extern sem_t turn_b[3][MAX_TYPE];
 
 void try_cross_b(unsigned int type, unsigned int dir);
 
