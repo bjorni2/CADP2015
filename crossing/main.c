@@ -56,7 +56,7 @@ int main(int argc, char * argv[]) {
 	if (strncmp(mode, "simple", strlen("simple")) == 0) {
 		pthread_create(&pt_ui, NULL, draw_s, (void *) &state_s);
 		start_s(k, agents);
-	} else if (strncmp(mode, "extended", strlen("extended")) == 0) {
+	} else if (strncmp(mode, "extended", strlen("ext")) == 0) {
 		pthread_create(&pt_ui, NULL, draw_c, (void *) &state_c);
 		start_c(k, agents);
 	} else if (strncmp(mode, "busy", strlen("busy")) == 0) {
