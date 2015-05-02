@@ -5,7 +5,7 @@ struct busy state_b;
 bool started_b = false;
 unsigned int K_b;
 sem_t light_b;
-sem_t turn_b[2][MAX_TYPE];
+sem_t turn_b[3][MAX_TYPE];
 
 void start_b(unsigned int k, size_t MAX_SPAWNS) {
 	unsigned int i;
@@ -22,11 +22,14 @@ void start_b(unsigned int k, size_t MAX_SPAWNS) {
 	for (i = 0; i < MAX_TYPE; ++i) {
 		state_b.crossing[VERTICAL][i] = 0;
 		state_b.crossing[HORIZONTAL][i] = 0;
+		state_b.crossing[DIAGONAL][i] = 0;
 		state_b.waiting[VERTICAL][i] = 0;
 		state_b.waiting[HORIZONTAL][i] = 0;
+		state_b.waiting[DIAGONAL][i] = 0;
 		state_b.k[i] = 1;
 		state_b.last[i] = true;
 	}
+	state_b.k[DIAGONAL] = 1;
 	state_b.last_pv = true;
 	
 	sem_init(&light_b, 0, 1);
@@ -34,6 +37,7 @@ void start_b(unsigned int k, size_t MAX_SPAWNS) {
 	sem_init(&turn_b[VERTICAL][VEHICLE], 0, 0);
 	sem_init(&turn_b[HORIZONTAL][PEDESTRIAN], 0, 0);
 	sem_init(&turn_b[HORIZONTAL][VEHICLE], 0, 0);
+	sem_init(&turn_b[DIAGONAL][PEDESTRIAN], 0, 0);
 
 	pthread_create(&pt, NULL, spawner_b, ((void *) MAX_SPAWNS));
 
@@ -105,7 +109,7 @@ void try_cross_b(unsigned int type, unsigned int dir) {
 		_LLB_SEM_WAIT(&turn_c[dir][type]);
 	}
 
-	if (dec_k_b(type, dir)) {
+	if (dec_k_b(type, dir)) { // missing for diagonal
 		if (--state_b.k[!dir] == 0) {
 			done = true;
 		}
@@ -128,18 +132,29 @@ void try_cross_b(unsigned int type, unsigned int dir) {
 
 void signal_b(unsigned int type, unsigned int dir) {
 	int i,j;
-	bool waiting_c[2] = { false, false };
+	bool waiting_b[2] = { false, false };
 	bool flag1 = false, flag2 = false;
 	bool ped_dir = false, ped_nodir = false, veh_dir = false;
 
+	if (dir == DIAGONAL){
+		state_b.last[0] = !state_b.last[0];
+		if(state_b.waiting[dir][type] && state_b.last[0]){
+			not_waiting_b(type, dir);
+			_LLB_SEM_POST(&turn_b[dir][type]);
+		} else {
+			_LLB_SEM_POST(&light_b);
+		}
+		return;
+	}
+	
 	for (i = 0; i < 2; ++i) {
 		for (j=0; j < MAX_TYPE; ++j) {
 			if (state_b.waiting[i][j] > 0)
-				waiting_c[i] = true;
+				waiting_b[i] = true;
 		}
 	}
 
-	if (state_b.k[!dir] == 0 && waiting_c[!dir]) {
+	if (state_b.k[!dir] == 0 && waiting_b[!dir]) {
 		_LLB_SEM_POST(&light_b);
 		return;
 	} else if (state_b.crossing[!dir][PEDESTRIAN]) {
@@ -205,6 +220,26 @@ void signal_b(unsigned int type, unsigned int dir) {
 inline bool leaving_crossing_b(unsigned int type, unsigned int dir) {
 	unsigned int i;
 	bool last = true;
+	if (dir == DIAGONAL) {
+		if (state_b.crossing[dir][PEDESTRIAN] == 0 && state_b.crossing[VERTICAL][PEDESTRIAN]){
+			if(state_b.waiting[HORIZONTAL][VEHICLE]){
+				state_b.k[HORIZONTAL] = K_b;
+				not_waiting_b(VEHICLE, HORIZONTAL);
+				_LLB_SEM_POST(&turn_b[HORIZONTAL][VEHICLE]);
+				return true;
+			}
+			return false;
+		}
+		else if (state_b.crossing[dir][PEDESTRIAN] == 0 && state_b.crossing[HORIZONTAL][PEDESTRIAN]){
+			if(state_b.waiting[VERTICAL][VEHICLE]){
+				state_b.k[VERTICAL] = K_b;
+				not_waiting_b(VEHICLE, VERTICAL);
+				_LLB_SEM_POST(&turn_b[VERTICAL][VEHICLE]);
+				return true;
+			}
+			return false;
+		}
+	}
 	for (i = 0; i < MAX_TYPE; ++i) {
 		if (state_b.crossing[dir][i] > 0) last = false;
 	}
@@ -215,16 +250,16 @@ inline bool leaving_crossing_b(unsigned int type, unsigned int dir) {
 		}
 		for (i = 0; i < MAX_TYPE; ++i) {
 			if (state_b.waiting[!dir][i]) {
-				state_b.k[!dir] = K_c;
+				state_b.k[!dir] = K_b;
 				not_waiting_b(i, !dir);
-				_LLB_SEM_POST(&turn_c[!dir][i]);
+				_LLB_SEM_POST(&turn_b[!dir][i]);
 				return true;
 			}
 		}
 	} else if (type == VEHICLE && state_b.crossing[dir][type] == 0 && state_b.waiting[!dir][!type]) {
-		state_b.k[!dir] = K_c;
+		state_b.k[!dir] = K_b;
 		not_waiting_b(!type, !dir);
-		_LLB_SEM_POST(&turn_c[!dir][!type]);
+		_LLB_SEM_POST(&turn_b[!dir][!type]);
 		return true;
 	}
 
@@ -233,15 +268,20 @@ inline bool leaving_crossing_b(unsigned int type, unsigned int dir) {
 
 inline void push_button_b(unsigned int dir) {
 	unsigned int i;
+	if (dir == DIAGONAL){
+		if (state_b.waiting[dir][PEDESTRIAN] == 0)
+			state_b.k[dir] = K_b;
+		return;
+	}
 	for (i = 0; i < MAX_TYPE; ++i) {
 		if (state_b.waiting[dir][i] > 0) return;
 	}
 	// I'm the first one to wait, push the button
-	state_b.k[dir] = K_c; // <- pushing the button
+	state_b.k[dir] = K_b; // <- pushing the button
 }
 
 inline bool dec_k_b(unsigned int type, unsigned int dir) {
-	unsigned int i;
+	unsigned int i;	
 	if (state_b.k[!dir] == 0) {
 		return false;
 	}
@@ -259,6 +299,15 @@ inline bool dec_k_b(unsigned int type, unsigned int dir) {
 }
 
 inline bool can_cross_b(unsigned int type, unsigned int dir) {
+	if(dir == DIAGONAL){
+		if(state_b.k[HORIZONTAL] == 0 || state_b.k[VERTICAL] == 0){
+			return false;
+		}
+		else if (state_b.crossing[VERTICAL][VEHICLE] > 0 || state_b.crossing[HORIZONTAL][VEHICLE]){
+			return false;
+		}
+		return true;
+	}
 	if (state_b.k[!dir] == 0) {
 		return false; // TODO: REMOVE
 		if (type == VEHICLE) {
@@ -270,7 +319,7 @@ inline bool can_cross_b(unsigned int type, unsigned int dir) {
 	if (state_b.crossing[!dir][!type] > 0) {
 		return false;
 	}
-	if (type == VEHICLE && state_b.crossing[!dir][type] > 0) {
+	if (type == VEHICLE && (state_b.crossing[!dir][type] > 0 || state_b.crossing[DIAGONAL][!type])) {
 		return false;
 	}
 	// nothing is stopping me
