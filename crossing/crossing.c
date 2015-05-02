@@ -16,6 +16,7 @@ void start_c(unsigned int k, size_t MAX_SPAWNS) {
 	}
 	started_c = true;
 	K_c = k;
+	srand(time(NULL));
 
 	for (i = 0; i < MAX_TYPE; ++i) {
 		state_c.crossing[VERTICAL][i] = 0;
@@ -84,36 +85,35 @@ void * spawner_c(void * argp) {
 void try_cross_ped(unsigned int dir){
 	log_sem_c();
 	sem_wait(&light_c);
-	if ((state_c.crossing[!dir][VEHICLE] != 0 || state_c.k[!dir] == 0)) {
+	if (state_c.crossing[!dir][VEHICLE] != 0 || state_c.k[!dir] == 0) {
 		waiting_c(PEDESTRIAN, dir);
-		if(state_c.waiting[dir][VEHICLE] == 0 && state_c.waiting[dir][PEDESTRIAN] == 1){
+		if(state_c.waiting[dir][VEHICLE] == 0 && state_c.waiting[dir][PEDESTRIAN] == 1) {
 			state_c.k[dir] = K_c;
 		}
 		sem_post(&light_c);
 		sem_wait(&turn_c[dir][PEDESTRIAN]);
 	}
 	
-	if(state_c.waiting[!dir][VEHICLE] > 0){
+	if (state_c.waiting[!dir][VEHICLE] > 0) {
 		state_c.k[!dir]--;
 	}
 	
 	inc_cross_c(PEDESTRIAN, dir);
 	
-	if(state_c.waiting[!dir][VEHICLE] > 0 && state_c.k[!dir] == 0) {
+	if (state_c.waiting[!dir][VEHICLE] > 0 && state_c.k[!dir] == 0) {
 		sem_post(&light_s);
 	} else {
 		signal_c();
 	}
-	//crossing, sleep?
 	rand_sleep(900);
 	sem_wait(&light_c);
 	done_inc_cross_c(PEDESTRIAN, dir);
 	
-	if(state_c.crossing[dir][PEDESTRIAN] == 0 && state_c.crossing[dir][VEHICLE] == 0 && state_c.waiting[!dir][VEHICLE] > 0 /*&& state_s.k[!type] == 0*/){
+	if (state_c.crossing[dir][PEDESTRIAN] == 0 && state_c.crossing[dir][VEHICLE] == 0 && state_c.waiting[!dir][VEHICLE] > 0) {
 		state_c.k[!dir] = K_c;
 		not_waiting_c(VEHICLE, !dir);
 		sem_post(&turn_c[!dir][VEHICLE]);
-	} else{
+	} else {
 		signal_c();
 	}
 }
@@ -162,8 +162,8 @@ void try_cross_veh(unsigned int dir){
 
 void signal_c(){
 	log_sem_c();
-	if(state_c.waiting[VERTICAL][VEHICLE] > 0 && state_c.crossing[HORIZONTAL][VEHICLE] == 0 && state_c.crossing[HORIZONTAL][PEDESTRIAN] == 0){
-		if(state_c.waiting[VERTICAL][PEDESTRIAN] > 0){
+	if(state_c.waiting[VERTICAL][VEHICLE] > 0 && state_c.crossing[HORIZONTAL][VEHICLE] == 0 && state_c.crossing[HORIZONTAL][PEDESTRIAN] == 0) {
+		if(state_c.waiting[VERTICAL][PEDESTRIAN] > 0) {
 			if(state_c.last[VERTICAL] == true){
 				state_c.last[VERTICAL] = false;
 				not_waiting_c(VEHICLE, VERTICAL);
@@ -179,9 +179,8 @@ void signal_c(){
 			not_waiting_c(VEHICLE, VERTICAL);
 			sem_post(&turn_c[VERTICAL][VEHICLE]);
 		}
-	}
-	else if(state_c.waiting[HORIZONTAL][VEHICLE] > 0 && state_c.crossing[VERTICAL][VEHICLE] == 0 && state_c.crossing[VERTICAL][PEDESTRIAN] == 0){
-		if(state_c.waiting[HORIZONTAL][PEDESTRIAN] > 0){
+	} else if(state_c.waiting[HORIZONTAL][VEHICLE] > 0 && state_c.crossing[VERTICAL][VEHICLE] == 0 && state_c.crossing[VERTICAL][PEDESTRIAN] == 0) {
+		if(state_c.waiting[HORIZONTAL][PEDESTRIAN] > 0) {
 			if(state_c.last[HORIZONTAL] == true){
 				state_c.last[HORIZONTAL] = false;
 				not_waiting_c(VEHICLE, HORIZONTAL);
@@ -192,13 +191,11 @@ void signal_c(){
 				not_waiting_c(PEDESTRIAN, HORIZONTAL);
 				sem_post(&turn_c[HORIZONTAL][PEDESTRIAN]);
 			}
-		}
-		else{
+		} else{
 			not_waiting_c(VEHICLE, HORIZONTAL);
 			sem_post(&turn_c[HORIZONTAL][VEHICLE]);
 		}
-	}
-	else if(state_c.waiting[HORIZONTAL][PEDESTRIAN] > 0 && state_c.crossing[VERTICAL][VEHICLE] == 0){
+	} else if(state_c.waiting[HORIZONTAL][PEDESTRIAN] > 0 && state_c.crossing[VERTICAL][VEHICLE] == 0) {
 		if(state_c.waiting[VERTICAL][PEDESTRIAN] > 0){
 			if(state_c.last_pv == true){
 				state_c.last_pv = false;
@@ -215,12 +212,10 @@ void signal_c(){
 			not_waiting_c(PEDESTRIAN, HORIZONTAL);
 			sem_post(&turn_c[HORIZONTAL][PEDESTRIAN]);
 		}
-	}
-	else if(state_c.waiting[VERTICAL][PEDESTRIAN] > 0 && state_c.crossing[HORIZONTAL][VEHICLE] == 0){
+	} else if(state_c.waiting[VERTICAL][PEDESTRIAN] > 0 && state_c.crossing[HORIZONTAL][VEHICLE] == 0) {
 		not_waiting_c(PEDESTRIAN, VERTICAL);
 		sem_post(&turn_c[VERTICAL][PEDESTRIAN]);
-	}
-	else{
+	} else {
 		sem_post(&light_c);
 	}
 }
@@ -305,11 +300,11 @@ void log_sem_c() {
 	sem_getvalue(&turn_c[VERTICAL][1], &v1);
 	sem_getvalue(&turn_c[HORIZONTAL][0], &h0);
 	sem_getvalue(&turn_c[HORIZONTAL][1], &h1);
-	sprintf(msg, "[L, V0, V1, H0, H1]: %d %d %d %d %d", l, v0, v1, h0, h1);
-	log_actionl(msg, 4);
+//	sprintf(msg, "[L, V0, V1, H0, H1]: %d %d %d %d %d", l, v0, v1, h0, h1);
+//	log_actionl(msg, 4);
 //	sprintf(msg, "S: CV0, CV1, CH0, CH1, WV0, WV1, WH0, WH1, KV, KH");
 //	log_actionl(msg, 4);
-	sprintf(msg, "S: %3u, %3u, %3u, %3u, %3u, %3u, %3u, %3u, %2u, %2u",
+	sprintf(msg, "S: %3u, %3u, %3u, %3u, %3u, %3u, %3u, %3u, %2u, %2u, [%d %d %d %d %d]",
 			state_c.crossing[VERTICAL][0],
 			state_c.crossing[VERTICAL][1],
 			state_c.crossing[HORIZONTAL][0],
@@ -319,8 +314,8 @@ void log_sem_c() {
 			state_c.waiting[HORIZONTAL][0],
 			state_c.waiting[HORIZONTAL][1],
 			state_c.k[0],
-			state_c.k[1]
-			);
+			state_c.k[1],
+			l, v0, v1, h0, h1);
 	log_actionl(msg, 12);
 	free(msg);
 }
