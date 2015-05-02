@@ -14,6 +14,9 @@ run: $(TARGET)
 ext: $(TARGET)
 	./$(TARGET) extended
 
+busy: $(TARGET)
+	./$(TARGET) busy
+
 clean:
 	rm $(TARGET)
 

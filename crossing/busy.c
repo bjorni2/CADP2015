@@ -31,7 +31,7 @@ void start_b(unsigned int k, size_t MAX_SPAWNS) {
 	sem_init(&turn_h[PEDESTRIAN], 0, 0);
 	sem_init(&turn_h[VEHICLE], 0, 0);
 
-	pthread_create(&pt, NULL, spawner_c, ((void *) MAX_SPAWNS));
+	pthread_create(&pt, NULL, spawner_b, ((void *) MAX_SPAWNS));
 
 	while (true) {
 		bool stop = true;
