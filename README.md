@@ -46,4 +46,6 @@ Capital letters represent agents that are currently crossing; lower-case letters
 The program saves logging output of the simulation to `log.txt`. ***If the file exists, it will be overwritten.***
 The log will indicate at the top how many agents will be spawned in the simulation and may optionally summarize at the bottom what kinds of agents were spawned. The log contains events for agents crossing (`+CROSS`), exiting (`-CROSS`), waiting (`+wait`) and no longer waiting (`-wait`). In the non-simple configurations, the log will also print out the state of the structs and semaphores. The format of the state is like so:
 
-`[P, V]vertical crossing, [P, V]horizontal crossing, [p, v]vertical waitig, [p, v]horizontal waiting, {[P, p]diagonal}, k: [0, 1], Semaphores:[light, vP, vV, hP, hV, d]`
+`[P, V]vertical crossing, [P, V]horizontal crossing, [p, v]vertical waitig, [p, v]horizontal waiting, {[P, p]diagonal}, k: [0, 1], Semaphores:[light, vP, vV, hP, hV, d]`.
+
+Oh, look at the time, it is now Sunday, which is holy. Thanks for all the fish. (If there are any questions, please ask on Monday).
