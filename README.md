@@ -5,8 +5,11 @@
 
 ## Running:
 `./crossing <configuration> [K] [MAX_SPAWNS]`
+
 `<configuration>` is one of `simple`, `ext[ended]` or `busy`
+
 `K` and `MAX_SPAWNS` are optional. If K > MAX_SPAWNS, the value is swapped.
+
 The arguments can be positioned anywhere (`./crossing 10 simple 1000` is equivalent to `./crossing simple 1000 10`).
 
 ### Visualization
